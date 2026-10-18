@@ -1897,7 +1897,8 @@
         list = applySearchToProducts(list);
     updateSearchHint(list.length, getThemeLabel());
 
-list.forEach(p=>g.innerHTML+=createCardHTML(p));
+if(!list.length){g.innerHTML='<div class="col-span-full rounded-xl border border-orange-200 bg-orange-50 p-5 text-sm text-orange-900">Bu filtrede örnek yemek bulunamadı. <button class="font-bold underline" onclick="setCountryFilter(&quot;all&quot;)">Tüm yemekleri göster</button></div>';return;}
+    list.forEach(p=>g.innerHTML+=createCardHTML(p));
   }
 
   // Slider
@@ -2078,7 +2079,7 @@ list.forEach(p=>g.innerHTML+=createCardHTML(p));
 
     // Taste of Home country filter
     if(countryFilter!=='all'){
-      list=list.filter(p=>p.cuisineCountry===countryFilter);
+      list=list.filter(p=>String(p.cuisineCountry||'').toUpperCase()===String(countryFilter).toUpperCase());
     }
 
         list = applySearchToProducts(list);
@@ -3243,11 +3244,13 @@ function parseAllergens(txt){
 
   // INIT
   window.onload=async ()=>{
-    renderProducts('all');
-    renderBestDeals();
-    renderTasteChips();
-    await loadRemoteState();
-    setTimeout(maybeShowWelcome, 600);
+    const safeInit=(name,fn)=>{try{fn()}catch(e){console.error('GastroPazar init '+name,e)}};
+    safeInit('products',()=>renderProducts('all'));
+    safeInit('deals',()=>renderBestDeals());
+    safeInit('countries',()=>renderTasteChips());
+    try{await loadRemoteState()}catch(e){console.warn('Demo data unavailable',e)}
+    safeInit('products-final',()=>renderProducts(currentHomeFilter||'all'));
+    setTimeout(()=>safeInit('welcome',()=>maybeShowWelcome()),600);
   };
 </script>
 
