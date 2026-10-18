@@ -1680,20 +1680,15 @@
   // Taste of Home filter
   let countryFilter = 'all';
   function setCountryFilter(code){
-    countryFilter = code || 'all';
-    ['all','tr','it','es','in','jp'].forEach(x=>{
-      const el=document.getElementById('chip-'+x);
-      if(el) el.classList.remove('active');
-    });
-    const map={all:'chip-all',TR:'chip-tr',IT:'chip-it',ES:'chip-es',IN:'chip-in',JP:'chip-jp'};
-    const activeId=map[countryFilter] || 'chip-all';
-    const activeEl=document.getElementById(activeId);
-    if(activeEl) activeEl.classList.add('active');
+    countryFilter=String(code||'all').toUpperCase();
+    if(countryFilter==='ALL')countryFilter='all';
+    document.querySelectorAll('.country-chip').forEach(el=>el.classList.remove('active'));
+    const matching='chip-'+(countryFilter==='all'?'all':countryFilter.toLowerCase());
+    document.querySelectorAll('[id="'+matching+'"]').forEach(el=>el.classList.add('active'));
     renderProducts('all');
   }
 
-
-  function renderTasteChips(){
+    function renderTasteChips(){
     const row = document.getElementById('taste-row');
     const active = document.getElementById('taste-active');
     if(!row) return;
