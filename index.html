@@ -371,7 +371,7 @@
 
 
   <!-- HOME -->
-  <div id="home-view">
+  <div id="home-view">\n    <div role="note" class="max-w-7xl mx-auto px-4 pt-3"><div class="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-xs text-orange-900"><strong>GastroPazar önizleme:</strong> Bu sayfadaki örnek yemekler, talepler, teklifler ve kampanyalar demo amaçlıdır. Demo işlemleri yalnızca bu tarayıcıda saklanır; gerçek satış veya ödeme oluşturmaz. <a href="/panel.html" class="font-bold underline">Gerçek kullanıcı paneli →</a></div></div>
     <!-- Hero slider -->
     <section class="relative w-full overflow-hidden h-[350px] md:h-[400px] bg-gray-900 group">
       <div id="slider-track" class="slider-track flex h-full w-full">
@@ -1782,37 +1782,37 @@
 
 
 
-  // ---------------- LIVE DATABASE ----------------
-  async function syncRemoteCollection(collection, items){
+  // ---------------- BROWSER-ONLY DEMO STATE ----------------
+  // Demo actions are intentionally isolated from live user, order and payment data.
+  const DEMO_STATE_KEY='gastropazar-home-demo-v1';
+  function readDemoState(){
     try{
-      const res = await fetch('/api/state', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({collection, items})
-      });
-      if(!res.ok) throw new Error('HTTP '+res.status);
+      const data=JSON.parse(localStorage.getItem(DEMO_STATE_KEY)||'{}');
+      return data&&typeof data==='object'?data:{};
+    }catch{return {};}
+  }
+  async function syncRemoteCollection(collection, items){
+    if(!['acties','requests','offers'].includes(collection))return;
+    try{
+      const saved=readDemoState();
+      saved[collection]=items;
+      localStorage.setItem(DEMO_STATE_KEY,JSON.stringify(saved));
+      if(typeof showToast==='function')showToast('Demo değişikliği bu tarayıcıda kaydedildi.');
     }catch(err){
-      console.error('DB sync failed:', collection, err);
-      showToast?.('Veri kaydedilemedi. Bağlantıyı kontrol edin.');
+      console.error('Demo saving failed:',err);
+      if(typeof showToast==='function')showToast('Demo değişikliği kaydedilemedi.');
     }
   }
-
   async function loadRemoteState(){
-    try{
-      const res = await fetch('/api/state', {headers:{'Accept':'application/json'}});
-      if(!res.ok) throw new Error('HTTP '+res.status);
-      const data = await res.json();
-      acties = Array.isArray(data.acties) ? data.acties : [];
-      requests = Array.isArray(data.requests) ? data.requests : [];
-      offers = Array.isArray(data.offers) ? data.offers : [];
-      renderBestDeals();
-      renderProducts(currentHomeFilter || 'all');
-      if(document.getElementById('req-list')) renderRequestList();
-      if(document.getElementById('offer-list')) renderOfferList();
-      refreshOfferPickers();
-    }catch(err){
-      console.error('DB load failed:', err);
-    }
+    const data=readDemoState();
+    acties=Array.isArray(data.acties)?data.acties:acties;
+    requests=Array.isArray(data.requests)?data.requests:[];
+    offers=Array.isArray(data.offers)?data.offers:[];
+    renderBestDeals();
+    renderProducts(currentHomeFilter||'all');
+    if(document.getElementById('req-list'))renderRequestList();
+    if(document.getElementById('offer-list'))renderOfferList();
+    refreshOfferPickers();
   }
 
   // Header theme
