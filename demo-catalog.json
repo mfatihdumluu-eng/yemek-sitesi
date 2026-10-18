@@ -1,123 +1,303 @@
 {
-  "source": "GastroPazar_UI_merged_fixed_v8.html / index.html",
+  "source": "GastroPazar original HTML – demo data, fictional",
   "chefs": [
     {
       "id": "ayse",
-      "name": "Ayşe'nin Mutfağı"
+      "name": "Ayşe'nin Mutfağı",
+      "image": "https://randomuser.me/api/portraits/women/44.jpg",
+      "location": "Rotterdam",
+      "rating": 4.9,
+      "origin": "Kayseri"
     },
     {
       "id": "sultan",
-      "name": "Sultan Sofrası"
+      "name": "Sultan Sofrası",
+      "image": "https://randomuser.me/api/portraits/men/85.jpg",
+      "location": "Üsküdar",
+      "rating": 5,
+      "origin": "Osmanlı"
     },
     {
       "id": "deniz",
-      "name": "Deniz'in Ege Mutfağı"
+      "name": "Deniz'in Ege Mutfağı",
+      "image": "https://randomuser.me/api/portraits/women/68.jpg",
+      "location": "Delfshaven",
+      "rating": 4.7,
+      "origin": "İzmir"
     },
     {
       "id": "karadeniz",
-      "name": "Karadeniz Rüzgarı"
+      "name": "Karadeniz Rüzgarı",
+      "image": "https://randomuser.me/api/portraits/men/32.jpg",
+      "location": "Schiedam",
+      "rating": 4.9,
+      "origin": "Trabzon"
     },
     {
       "id": "arjun",
-      "name": "Arjun's Indian Kitchen"
+      "name": "Arjun's Indian Kitchen",
+      "image": "https://randomuser.me/api/portraits/men/52.jpg",
+      "location": "Utrecht",
+      "rating": 4.7,
+      "origin": "Delhi"
     },
     {
       "id": "yuki",
-      "name": "Yuki's Tokyo Bento"
+      "name": "Yuki's Tokyo Bento",
+      "image": "https://randomuser.me/api/portraits/women/65.jpg",
+      "location": "Rotterdam",
+      "rating": 4.9,
+      "origin": "Tokyo"
     },
     {
       "id": "isabel",
-      "name": "Isabel Cocina"
+      "name": "Isabel Cocina",
+      "image": "https://randomuser.me/api/portraits/women/12.jpg",
+      "location": "Utrecht",
+      "rating": 4.7,
+      "origin": "Valencia"
     },
     {
       "id": "priyanka",
-      "name": "Priyanka's Curry Lab"
+      "name": "Priyanka's Curry Lab",
+      "image": "https://randomuser.me/api/portraits/women/22.jpg",
+      "location": "Rotterdam",
+      "rating": 4.9,
+      "origin": "Delhi"
     },
     {
       "id": "kenji",
-      "name": "Kenji Home Ramen"
+      "name": "Kenji Home Ramen",
+      "image": "https://randomuser.me/api/portraits/men/22.jpg",
+      "location": "Den Haag",
+      "rating": 4.8,
+      "origin": "Tokyo"
     }
   ],
   "products": [
     {
       "id": 1,
       "title": "Haftalık Abonelik Planı",
-      "chef": "Ayşe"
+      "description": "7 günlük menünüzü seçin. Kalori hesabı otomatik.",
+      "chef": "Ayşe'nin Mutfağı",
+      "chefId": "ayse",
+      "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800",
+      "location": "Tüm Bölgeler",
+      "country": "TR",
+      "category": "weekly",
+      "price": 0,
+      "rating": 4.8,
+      "minOrder": 1
     },
     {
       "id": 2,
       "title": "Ramazan İftar Sofrası",
-      "chef": "Sultan Sofrası"
+      "description": "Başlangıçlar sabit, ana ve tatlı seçmeli.",
+      "chef": "Sultan Sofrası",
+      "chefId": "sultan",
+      "image": "https://images.unsplash.com/photo-1588612762283-c286e9273cba?w=800",
+      "location": "Üsküdar",
+      "country": "TR",
+      "category": "ramadan",
+      "price": 25,
+      "rating": 5,
+      "minOrder": 6
     },
     {
       "id": 3,
       "title": "Kayseri Mantısı",
-      "chef": "Ayşe"
+      "description": "El açması hamur, bol kıyma.",
+      "chef": "Ayşe'nin Mutfağı",
+      "chefId": "ayse",
+      "image": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=800",
+      "location": "Rotterdam",
+      "country": "TR",
+      "category": "main",
+      "price": 15,
+      "rating": 4.9,
+      "minOrder": 4
     },
     {
       "id": 4,
       "title": "Zeytinyağlı Sarma",
-      "chef": "Ayşe"
+      "description": "İncecik sarılmış, kuş üzümlü.",
+      "chef": "Ayşe'nin Mutfağı",
+      "chefId": "ayse",
+      "image": "https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?w=800",
+      "location": "Rotterdam",
+      "country": "TR",
+      "category": "main",
+      "price": 20,
+      "rating": 4.8,
+      "minOrder": 1
     },
     {
       "id": 5,
       "title": "Enginar Dolması",
-      "chef": "Deniz"
+      "description": "Zeytinyağlı, taze enginar.",
+      "chef": "Deniz'in Ege Mutfağı",
+      "chefId": "deniz",
+      "image": "https://images.unsplash.com/photo-1615937657715-bc7b4b7962c1?w=800",
+      "location": "Delfshaven",
+      "country": "TR",
+      "category": "main",
+      "price": 8,
+      "rating": 4.9,
+      "minOrder": 2
     },
     {
       "id": 6,
       "title": "Karadeniz Pidesi",
-      "chef": "Karadeniz Rüzgarı"
+      "description": "Kavurmalı, kaşarlı kapalı pide.",
+      "chef": "Karadeniz Rüzgarı",
+      "chefId": "karadeniz",
+      "image": "https://images.unsplash.com/photo-1574672280602-95cb48dad557?w=800",
+      "location": "Schiedam",
+      "country": "TR",
+      "category": "main",
+      "price": 12,
+      "rating": 4.8,
+      "minOrder": 2
     },
     {
       "id": 7,
       "title": "Fıstıklı Baklava",
-      "chef": "Sultan Sofrası"
+      "description": "Bol fıstıklı, ince hamur.",
+      "chef": "Sultan Sofrası",
+      "chefId": "sultan",
+      "image": "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=800",
+      "location": "Üsküdar",
+      "country": "TR",
+      "category": "dessert",
+      "price": 30,
+      "rating": 5,
+      "minOrder": 1
     },
     {
       "id": 8,
       "title": "Sicilya Usulü Pizza (Demo)",
-      "chef": "Sultan Sofrası"
+      "description": "İtalyan ev usulü, ince hamur.",
+      "chef": "Sultan Sofrası",
+      "chefId": "sultan",
+      "image": "https://images.unsplash.com/photo-1548365328-9f547dbbd1d7?w=800",
+      "location": "Üsküdar",
+      "country": "IT",
+      "category": "main",
+      "price": 18,
+      "rating": 4.7,
+      "minOrder": 1
     },
     {
       "id": 9,
       "title": "Valencia Paella",
-      "chef": "Maria"
+      "description": "Orijinal Valencia usulü (deniz ürünü opsiyonlu).",
+      "chef": "Maria's Paella House",
+      "chefId": "maria",
+      "image": "https://images.unsplash.com/photo-1604908811849-77b0d31589e3?w=800",
+      "location": "Amsterdam",
+      "country": "ES",
+      "category": "main",
+      "price": 22,
+      "rating": 4.8,
+      "minOrder": 2
     },
     {
       "id": 10,
       "title": "Butter Chicken (Mild)",
-      "chef": "Arjun"
+      "description": "Kremalı, dengeli baharat (acı düşük).",
+      "chef": "Arjun's Indian Kitchen",
+      "chefId": "arjun",
+      "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800",
+      "location": "Utrecht",
+      "country": "IN",
+      "category": "main",
+      "price": 18,
+      "rating": 4.7,
+      "minOrder": 2
     },
     {
       "id": 11,
       "title": "Tokyo Bento Box",
-      "chef": "Yuki"
+      "description": "Dengeli bento: protein + sebze + pirinç.",
+      "chef": "Yuki's Tokyo Bento",
+      "chefId": "yuki",
+      "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?w=800",
+      "location": "Rotterdam",
+      "country": "JP",
+      "category": "main",
+      "price": 16,
+      "rating": 4.9,
+      "minOrder": 1
     },
     {
       "id": 12,
       "title": "Tiramisu (Italian)",
-      "chef": "Deniz"
+      "description": "Klasik tiramisu, kahve aroması.",
+      "chef": "Deniz'in Ege Mutfağı",
+      "chefId": "deniz",
+      "image": "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=800",
+      "location": "Delfshaven",
+      "country": "IT",
+      "category": "dessert",
+      "price": 9,
+      "rating": 4.7,
+      "minOrder": 2
     },
     {
       "id": 13,
       "title": "Pizza Margherita",
-      "chef": "Marco"
+      "description": "Napoli usulü ince hamur, taze mozzarella.",
+      "chef": "Marco's Trattoria",
+      "chefId": "marco",
+      "image": "https://images.unsplash.com/photo-1548365328-9f547b1b9f4e?w=800",
+      "location": "Amsterdam",
+      "country": "it",
+      "category": "main",
+      "price": 14,
+      "rating": 4.8,
+      "minOrder": 1
     },
     {
       "id": 14,
       "title": "Valencia Paella",
-      "chef": "Isabel Cocina"
+      "description": "Safranlı pirinç, deniz ürünleri ve sebze.",
+      "chef": "Isabel Cocina",
+      "chefId": "isabel",
+      "image": "https://images.unsplash.com/photo-1604908554162-63f63683bcab?w=800",
+      "location": "Utrecht",
+      "country": "es",
+      "category": "main",
+      "price": 18,
+      "rating": 4.7,
+      "minOrder": 2
     },
     {
       "id": 15,
       "title": "Butter Chicken",
-      "chef": "Priyanka"
+      "description": "Kremalı domates soslu tavuk köri.",
+      "chef": "Priyanka's Curry Lab",
+      "chefId": "priyanka",
+      "image": "https://images.unsplash.com/photo-1604909052743-94e3be8c46dc?w=800",
+      "location": "Rotterdam",
+      "country": "in",
+      "category": "main",
+      "price": 16,
+      "rating": 4.9,
+      "minOrder": 1
     },
     {
       "id": 16,
       "title": "Shoyu Ramen",
-      "chef": "Kenji Home Ramen"
+      "description": "12 saat kaynamış broth, noodle ve yumurta.",
+      "chef": "Kenji Home Ramen",
+      "chefId": "kenji",
+      "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?w=800",
+      "location": "Den Haag",
+      "country": "jp",
+      "category": "main",
+      "price": 17,
+      "rating": 4.8,
+      "minOrder": 1
     }
   ]
 }
