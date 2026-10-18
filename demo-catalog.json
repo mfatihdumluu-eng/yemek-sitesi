@@ -1,0 +1,123 @@
+{
+  "source": "GastroPazar_UI_merged_fixed_v8.html / index.html",
+  "chefs": [
+    {
+      "id": "ayse",
+      "name": "Ayşe'nin Mutfağı"
+    },
+    {
+      "id": "sultan",
+      "name": "Sultan Sofrası"
+    },
+    {
+      "id": "deniz",
+      "name": "Deniz'in Ege Mutfağı"
+    },
+    {
+      "id": "karadeniz",
+      "name": "Karadeniz Rüzgarı"
+    },
+    {
+      "id": "arjun",
+      "name": "Arjun's Indian Kitchen"
+    },
+    {
+      "id": "yuki",
+      "name": "Yuki's Tokyo Bento"
+    },
+    {
+      "id": "isabel",
+      "name": "Isabel Cocina"
+    },
+    {
+      "id": "priyanka",
+      "name": "Priyanka's Curry Lab"
+    },
+    {
+      "id": "kenji",
+      "name": "Kenji Home Ramen"
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "title": "Haftalık Abonelik Planı",
+      "chef": "Ayşe"
+    },
+    {
+      "id": 2,
+      "title": "Ramazan İftar Sofrası",
+      "chef": "Sultan Sofrası"
+    },
+    {
+      "id": 3,
+      "title": "Kayseri Mantısı",
+      "chef": "Ayşe"
+    },
+    {
+      "id": 4,
+      "title": "Zeytinyağlı Sarma",
+      "chef": "Ayşe"
+    },
+    {
+      "id": 5,
+      "title": "Enginar Dolması",
+      "chef": "Deniz"
+    },
+    {
+      "id": 6,
+      "title": "Karadeniz Pidesi",
+      "chef": "Karadeniz Rüzgarı"
+    },
+    {
+      "id": 7,
+      "title": "Fıstıklı Baklava",
+      "chef": "Sultan Sofrası"
+    },
+    {
+      "id": 8,
+      "title": "Sicilya Usulü Pizza (Demo)",
+      "chef": "Sultan Sofrası"
+    },
+    {
+      "id": 9,
+      "title": "Valencia Paella",
+      "chef": "Maria"
+    },
+    {
+      "id": 10,
+      "title": "Butter Chicken (Mild)",
+      "chef": "Arjun"
+    },
+    {
+      "id": 11,
+      "title": "Tokyo Bento Box",
+      "chef": "Yuki"
+    },
+    {
+      "id": 12,
+      "title": "Tiramisu (Italian)",
+      "chef": "Deniz"
+    },
+    {
+      "id": 13,
+      "title": "Pizza Margherita",
+      "chef": "Marco"
+    },
+    {
+      "id": 14,
+      "title": "Valencia Paella",
+      "chef": "Isabel Cocina"
+    },
+    {
+      "id": 15,
+      "title": "Butter Chicken",
+      "chef": "Priyanka"
+    },
+    {
+      "id": 16,
+      "title": "Shoyu Ramen",
+      "chef": "Kenji Home Ramen"
+    }
+  ]
+}
