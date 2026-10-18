@@ -47,4 +47,4 @@ if($('productForm'))$('productForm').onsubmit=e=>{e.preventDefault();const d=Obj
 document.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>{role=b.dataset.role;sub='overview';history.replaceState(null,'','?role='+role);render()});
 $('reset').onclick=()=>{if(confirm('Demo verilerini sıfırlamak istiyor musun?')){areas=structuredClone(baseAreas);chefApprovals={};drafts=[];cart=[];orders=[];search='';category='all';country='all';sub='overview';render()}};
 fetch('/demo-catalog.json').then(r=>{if(!r.ok)throw Error('Katalog bulunamadı');return r.json()}).then(d=>{catalog=d;render()}).catch(e=>{$('content').innerHTML='<div class="empty">Demo katalog yüklenemedi: '+escapeHTML(e.message)+'</div>'});
-</script></body></html>
+</script><script src="/demo-features.js" defer></script></body></html>
