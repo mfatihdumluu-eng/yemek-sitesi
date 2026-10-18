@@ -1853,16 +1853,8 @@
     prefillRequestTemplate();
     setTimeout(updateRequestThemeLinkUI,0);
   }
-  function openChefPanel(){
-    resetHeaderTheme();
-    showView('chef-panel-view');
-    initChefPanel();
-  }
-  function openActie(){
-    resetHeaderTheme();
-    showView('actie-view');
-    initActieUI();
-  }
+  function openChefPanel(){ window.location.href='/sef.html'; }
+  function openActie(){ window.location.href='/sef.html'; }
 
   function openThemePage(key){
     currentThemeKey=key;
@@ -3264,5 +3256,6 @@ function parseAllergens(txt){
   };
 </script>
 
+<script src="/role-nav.js" defer></script>
 </body>
 </html>
