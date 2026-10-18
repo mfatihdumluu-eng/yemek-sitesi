@@ -34,8 +34,19 @@ export default async function handler(req,res){
   return res.status(201).json({user:rows[0]});
  }
  if(b.action==='login'){
+  const ip=String(req.headers['x-forwarded-for']||req.socket?.remoteAddress||'unknown').split(',')[0].trim().slice(0,100);
+  const ipHash=sha256(ip),emailHash=sha256(email);
+  const limits=await sql`SELECT
+    (SELECT count(*)::int FROM auth_login_attempts WHERE ip_hash=${ipHash} AND attempted_at>now()-interval '15 minutes') AS ip_count,
+    (SELECT count(*)::int FROM auth_login_attempts WHERE email_hash=${emailHash} AND attempted_at>now()-interval '15 minutes') AS email_count`;
+  if(limits[0].ip_count>=30||limits[0].email_count>=8){
+    res.setHeader('Retry-After','900');
+    return jsonError(res,429,'Çok fazla giriş denemesi. Lütfen daha sonra tekrar deneyin');
+  }
+  await sql`INSERT INTO auth_login_attempts(email_hash,ip_hash) VALUES(${emailHash},${ipHash})`;
   const rows=await sql`SELECT id,email,display_name,role,password_hash FROM users WHERE email=${email} LIMIT 1`;
   if(!rows.length||!checkPassword(password,rows[0].password_hash))return jsonError(res,401,'Invalid email or password');
+  await sql`DELETE FROM auth_login_attempts WHERE email_hash=${emailHash}`;
   await issueSession(rows[0],res);
   const {password_hash,...user}=rows[0];return res.status(200).json({user});
  }
