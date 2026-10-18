@@ -8,6 +8,8 @@ export default async function handler(req,res) {
   res.setHeader('Cache-Control','no-store');
   try {
     if(req.method==='GET') {
+      // Pending record ownership migration, private user records are not exposed.
+      return res.status(200).json({requests:[],offers:[],acties:[]});
       const [requests,offers,promotions]=await Promise.all([
         sql\`SELECT * FROM requests ORDER BY created_at DESC\`,
         sql\`SELECT * FROM offers ORDER BY created_at DESC\`,
@@ -15,6 +17,7 @@ export default async function handler(req,res) {
       ]);
       return res.status(200).json({requests:requests.map(reqMap),offers:offers.map(offerMap),acties:promotions.map(promoMap)});
     }
+    if(req.method==='POST') return res.status(403).json({error:'Role-scoped write API is being implemented. Legacy shared writes are disabled.'});
     if(req.method!=='POST') { res.setHeader('Allow','GET, POST'); return res.status(405).json({error:'Method not allowed'}); }
     const body=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
     const items=body.items;
