@@ -27,12 +27,12 @@ export function cookie(res,token,maxAge=0) {
 export async function session(req) {
  const token=(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('gp_session='))?.slice(11);
  if(!token||!(/^[a-f0-9]{64}$/.test(token)))return null;
- const users=await sql\`SELECT u.id,u.email,u.display_name,u.role FROM user_sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=\${sha256(token)} AND s.expires_at>now() LIMIT 1\`;
+ const users=await sql`SELECT u.id,u.email,u.display_name,u.role FROM user_sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=${sha256(token)} AND s.expires_at>now() LIMIT 1`;
  return users[0]||null;
 }
 export async function issueSession(user,res) {
  const token=randomBytes(32).toString('hex');
- await sql\`INSERT INTO user_sessions(user_id,token_hash,expires_at) VALUES (\${user.id},\${sha256(token)},now()+interval '7 days')\`;
+ await sql`INSERT INTO user_sessions(user_id,token_hash,expires_at) VALUES (${user.id},${sha256(token)},now()+interval '7 days')`;
  cookie(res,token,604800);
 }
 export function jsonError(res,status,error){return res.status(status).json({error});}
