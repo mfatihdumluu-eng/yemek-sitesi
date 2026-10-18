@@ -1,0 +1,3268 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GastroPazar - Temalar + Haftalık Abonelik + Actie + Talepler</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['Merriweather', 'serif'],
+            sans: ['Inter', 'sans-serif']
+          },
+          colors: {
+            brand: { DEFAULT: '#E65100', light: '#FFF3E0', dark: '#BF360C' },
+            ramadan: { DEFAULT: '#047857', light: '#D1FAE5' },
+            vegan: { DEFAULT: '#16A34A', light: '#DCFCE7' },
+            noel: { DEFAULT: '#B91C1C', light: '#FEE2E2' },
+            helal: { DEFAULT: '#1D4ED8', light: '#DBEAFE' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .sticky-menu{position:sticky; top:64px; z-index:30; background:rgba(248,250,252,0.92); backdrop-filter: blur(10px); border-bottom:1px solid #e5e7eb;}
+    .sticky-menu-inner{padding-top:14px; padding-bottom:14px;}
+  
+    body { background-color: #F8FAFC; color: #334155; }
+    .img-container { aspect-ratio: 4/3; width: 100%; overflow: hidden; }
+    .img-fit { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .slider-track { transition: transform 0.5s ease-in-out; }
+    .tab-btn.active { color: #E65100; border-bottom: 2px solid #E65100; font-weight: 700; }
+    .ramadan-mode .tab-btn.active { color: #047857; border-bottom-color:#047857; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
+
+    /* Modal sabit yükseklik */
+    #modal-box { height: min(95vh, 860px); }
+
+    /* Rozetler */
+    .chef-badge{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 10px; border-radius:999px;
+      font-size:10px; font-weight:800; text-transform:uppercase;
+      border:1px solid transparent; white-space:nowrap;
+    }
+    .badge-gold { background:#FEF3C7; color:#B45309; border-color:#FCD34D; }
+    .badge-green { background:#D1FAE5; color:#047857; border-color:#6EE7B7; }
+    .badge-blue { background:#DBEAFE; color:#1E40AF; border-color:#93C5FD; }
+    .badge-purple { background:#F3E8FF; color:#6B21A8; border-color:#D8B4FE; }
+    .badge-red { background:#FEE2E2; color:#B91C1C; border-color:#FCA5A5; }
+
+    .allergen-tag{
+      display:inline-flex; align-items:center; gap:6px;
+      background:#FEF2F2; color:#B91C1C; border:1px solid #FECACA;
+      padding:2px 10px; border-radius:999px;
+      font-size:10px; font-weight:900; margin:4px 6px 0 0;
+      text-transform:uppercase;
+    }
+
+    .dish-info-box{
+      background:#fff; border-left:3px solid #E65100; padding:8px; margin-top:6px;
+      border-radius:0 8px 8px 0; font-size:11px; display:none;
+      box-shadow:0 2px 4px rgba(0,0,0,0.05);
+    }
+    .dish-info-box.active{ display:block; animation:slideDown 0.2s ease-out; }
+    @keyframes slideDown { from{opacity:0; transform:translateY(-5px)} to{opacity:1; transform:translateY(0)} }
+
+    .hide-scrollbar::-webkit-scrollbar{ height:0; }
+
+    /* Taste of Home chips */
+    .country-chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 12px; border-radius:999px;
+      background:#fff; border:1px solid #e5e7eb;
+      font-weight:800; font-size:12px; color:#111827;
+      transition:.15s ease;
+      white-space:nowrap;
+    }
+    .country-chip:hover{ border-color:#E65100; color:#E65100; }
+    .country-chip.active{ background:#FFF3E0; border-color:#E65100; color:#E65100; }
+
+    /* Diet icons */
+    .diet-ico{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:22px; height:22px; border-radius:8px;
+      border:1px solid #e5e7eb; background:#fff;
+      font-size:12px;
+    }
+    .diet-helal{ background:#DBEAFE; color:#1D4ED8; border-color:#BFDBFE; }
+    .diet-vegan{ background:#DCFCE7; color:#16A34A; border-color:#BBF7D0; }
+    .diet-kosher{ background:#F3E8FF; color:#6B21A8; border-color:#E9D5FF; }
+
+    /* Chef gallery */
+    .gallery-card{ border:1px solid #e5e7eb; border-radius:16px; overflow:hidden; background:#fff; }
+    .gallery-img{ width:100%; height:160px; object-fit:cover; }
+  
+    .country-chip.active{ background:#111827; color:#fff; border-color:#111827; }
+
+    /* --- FIX: Menü satırları tek çizgide + yatay scroll --- */
+    .gp-bar { position: sticky; top: 64px; z-index: 35; background: #F8FAFC; padding-top: 14px; }
+    .gp-row { display:flex; flex-wrap:nowrap; gap:12px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .gp-row::-webkit-scrollbar{ height:0; }
+    .gp-chip { flex:0 0 auto; }
+    .gp-row-wrap { display:flex; flex-direction:column; gap:12px; }
+
+    /* Toast */
+    #gp-toast { position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:60; }
+    .gp-row > * { flex: 0 0 auto; }
+
+
+    .quick-pill{
+      display:inline-flex; align-items:center; gap:8px;
+      height:44px; padding:0 18px;
+      border-radius:999px; border:2px solid #E5E7EB;
+      background:#fff; color:#111827;
+      font-weight:900; font-size:14px;
+      box-shadow:0 8px 20px rgba(15,23,42,0.06);
+      transition:all .15s ease;
+      white-space:nowrap;
+    }
+    .quick-pill:hover{ border-color:#111827; transform:translateY(-1px); }
+    .quick-pill.active{ background:#111827; color:#fff; border-color:#111827; }
+
+    .theme-tile{
+      display:flex; align-items:center; gap:12px;
+      padding:14px; border-radius:18px;
+      border:1px solid #E5E7EB; background:#fff;
+      box-shadow:0 8px 18px rgba(15,23,42,0.05);
+      transition:all .15s ease;
+    }
+    .theme-tile:hover{ transform:translateY(-1px); box-shadow:0 12px 26px rgba(15,23,42,0.09); }
+    .theme-ico{ width:44px; height:44px; border-radius:14px; display:grid; place-items:center; }
+
+  
+    /* Unified pill buttons */
+    .filter-pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:10px 18px; border-radius:999px;
+      border:1px solid #e5e7eb; background:#fff;
+      font-weight:800; font-size:14px; color:#111827;
+      box-shadow:0 10px 20px rgba(2,6,23,0.06);
+      transition:all .15s ease;
+      white-space:nowrap;
+    }
+    .filter-pill:hover{ border-color:#E65100; color:#E65100; transform:translateY(-1px); }
+    .filter-pill.active{ background:#0f172a; color:#fff; border-color:#0f172a; }
+    .country-chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 16px; border-radius:999px;
+      border:1px solid #e5e7eb; background:#fff;
+      font-weight:800; font-size:14px; color:#0f172a;
+      transition:.15s;
+    }
+    .country-chip.active{ background:#0f172a; color:#fff; border-color:#0f172a; }
+    .theme-pill{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 14px; border-radius:18px;
+      border:1px solid #e5e7eb; background:#fff;
+      min-width:220px;
+      box-shadow:0 10px 20px rgba(2,6,23,0.06);
+      transition:.15s;
+    }
+    .theme-pill:hover{ border-color:#E65100; transform:translateY(-1px); }
+    .theme-pill .icon{ width:38px; height:38px; border-radius:14px; display:flex; align-items:center; justify-content:center; }
+    .theme-pill .t{ display:flex; flex-direction:column; line-height:1.05; }
+    .theme-pill .t b{ font-size:14px; color:#111827; }
+    .theme-pill .t small{ font-size:12px; color:#94a3b8; font-weight:700; margin-top:2px; }
+
+  </style>
+</head>
+
+<body class="antialiased pb-10">
+
+  <!-- HEADER -->
+  <!-- HEADER -->
+  <header id="app-header" class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-3 md:py-0 md:h-16 flex flex-col md:flex-row md:items-center gap-3 md:gap-4 justify-between">
+      <div class="flex items-center gap-3 justify-between">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="goHome()">
+          <div id="brand-icon" class="w-8 h-8 bg-brand text-white rounded flex items-center justify-center font-bold">
+            <i class="fa-solid fa-utensils"></i>
+          </div>
+          <span class="font-serif text-xl font-bold text-gray-800">
+            Gastro<span id="brand-accent" class="text-brand">Pazar</span>
+          </span>
+        </div>
+
+        <!-- Mobile quick buttons -->
+        <div class="flex items-center gap-2 md:hidden">
+          <button onclick="openCompare()" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-3 py-2 rounded-full text-xs font-bold transition">
+            <i class="fa-solid fa-scale-balanced"></i>
+          </button>
+          <button class="relative group bg-gray-50 hover:bg-brand-light p-2 rounded-full border border-gray-200 transition flex items-center gap-2">
+            <div class="w-8 h-8 bg-brand text-white rounded-full flex items-center justify-center shadow-md">
+              <i class="fa-solid fa-basket-shopping text-sm"></i>
+            </div>
+            <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full hidden">0</span>
+          </button>
+        <button id="search-menu-btn" onclick="toggleSearchMenu(event)" class="absolute right-10 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg grid place-items-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition" title="Filtreler">
+            <i class="fa-solid fa-sliders"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="flex-1 w-full md:max-w-xl">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+          <input id="search-input" oninput="onSearchInput(this.value)" placeholder="Ara: yemek, şef, mutfak, ülke (örn: Mantı, Vegan, İtalyan)..."
+                 class="w-full pl-10 pr-10 py-2.5 md:py-2 rounded-full border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand text-sm">
+          <button id="search-clear" onclick="clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full hover:bg-gray-100 text-gray-400">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div id="search-hint" class="hidden text-[11px] text-gray-400 font-medium mt-1 px-3">
+          Filtre: <span id="search-context" class="font-bold text-gray-500">Tümü</span> • <span id="search-count" class="font-bold text-gray-500">0</span> sonuç
+        </div>
+        <!-- Search / Filters dropdown -->
+        <div id="search-menu" class="hidden absolute left-0 right-0 mt-2 z-50">
+          <div class="bg-white border border-gray-200 rounded-2xl shadow-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-earth-europe text-gray-400"></i>
+                <div class="font-extrabold text-gray-800">Taste of Home</div>
+                <span class="text-xs font-bold text-gray-500 bg-gray-50 border border-gray-200 px-2 py-1 rounded-full">Hangi ülkeyi özledin?</span>
+              </div>
+              <button onclick="clearAllQuickFilters()" class="text-sm font-extrabold text-brand hover:underline">
+                Filtreyi sıfırla
+              </button>
+            </div>
+
+            <!-- Country chips -->
+            <div class="flex flex-wrap gap-2 mb-4">
+              <button id="chip-all" class="country-chip active" onclick="setCountryFilter('all')">🌍 Tümü</button>
+              <button id="chip-tr" class="country-chip" onclick="setCountryFilter('tr')">🇹🇷 Türkiye</button>
+              <button id="chip-it" class="country-chip" onclick="setCountryFilter('it')">🇮🇹 İtalya</button>
+              <button id="chip-es" class="country-chip" onclick="setCountryFilter('es')">🇪🇸 İspanya</button>
+              <button id="chip-in" class="country-chip" onclick="setCountryFilter('in')">🇮🇳 Hindistan</button>
+              <button id="chip-jp" class="country-chip" onclick="setCountryFilter('jp')">🇯🇵 Japonya</button>
+            </div>
+
+            <!-- Main menu (same style) -->
+            <div class="flex flex-wrap gap-2 mb-4">
+              <button class="quick-pill active" data-q="all" onclick="applyQuickFilter('all', this)">Tümü</button>
+              <button class="quick-pill" data-q="deals" onclick="applyQuickFilter('deals', this)"><i class="fa-solid fa-bolt mr-2"></i>İndirimler</button>
+              <button class="quick-pill" data-q="weekly" onclick="applyQuickFilter('weekly', this)"><i class="fa-solid fa-calendar-week mr-2"></i>Haftalık Abonelik</button>
+              <button class="quick-pill" data-q="ramadan" onclick="applyQuickFilter('ramadan', this)"><i class="fa-solid fa-moon mr-2"></i>Ramazan</button>
+              <button class="quick-pill" data-q="main" onclick="applyQuickFilter('main', this)">Ana Yemek</button>
+              <button class="quick-pill" data-q="dessert" onclick="applyQuickFilter('dessert', this)">Tatlı</button>
+            </div>
+
+            <!-- Themes (same style cards) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <button class="theme-tile" onclick="openThemePage('helal'); closeSearchMenu()">
+                <div class="theme-ico bg-helal-light text-helal"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="text-left">
+                  <div class="font-extrabold text-gray-800">Helal</div>
+                  <div class="text-xs text-gray-500 font-bold">Helal odaklı ürünler</div>
+                </div>
+              </button>
+
+              <button class="theme-tile" onclick="openThemePage('vegan'); closeSearchMenu()">
+                <div class="theme-ico bg-vegan-light text-vegan"><i class="fa-solid fa-seedling"></i></div>
+                <div class="text-left">
+                  <div class="font-extrabold text-gray-800">Vegan</div>
+                  <div class="text-xs text-gray-500 font-bold">Bitkisel seçenekler</div>
+                </div>
+              </button>
+
+              <button class="theme-tile" onclick="openThemePage('noel'); closeSearchMenu()">
+                <div class="theme-ico bg-noel-light text-noel"><i class="fa-solid fa-gift"></i></div>
+                <div class="text-left">
+                  <div class="font-extrabold text-gray-800">Noel</div>
+                  <div class="text-xs text-gray-500 font-bold">Özel gün menüleri</div>
+                </div>
+              </button>
+
+              <button class="theme-tile" onclick="openThemePage('ramadan'); closeSearchMenu()">
+                <div class="theme-ico bg-ramadan-light text-ramadan"><i class="fa-solid fa-moon"></i></div>
+                <div class="text-left">
+                  <div class="font-extrabold text-gray-800">Ramazan</div>
+                  <div class="text-xs text-gray-500 font-bold">İftar &amp; sahur</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="hidden md:flex items-center gap-2 flex-wrap justify-end">
+        <button onclick="toggleTasteDropdown(true)" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-4 py-2 rounded-full text-sm font-bold transition">
+          <i class="fa-solid fa-flag mr-2"></i>Ülkeler
+        </button>
+
+        <button onclick="openRequests()" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-4 py-2 rounded-full text-sm font-bold transition">
+          <i class="fa-solid fa-clipboard-list mr-2"></i>Özel Talep
+        </button>
+
+        <button onclick="openActie()" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-4 py-2 rounded-full text-sm font-bold transition">
+          <i class="fa-solid fa-tags mr-2"></i>Acties
+        </button>
+
+        <button onclick="openChefPanel()" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-4 py-2 rounded-full text-sm font-bold transition">
+          <i class="fa-solid fa-user-chef mr-2"></i>Şef Paneli
+        </button>
+
+        <button onclick="openCompare()" class="bg-white border border-gray-200 hover:border-brand hover:text-brand px-4 py-2 rounded-full text-sm font-bold transition">
+          <i class="fa-solid fa-scale-balanced mr-2"></i>Kıyasla
+        </button>
+
+        <button class="relative group bg-gray-50 hover:bg-brand-light p-2 pr-4 rounded-full border border-gray-200 transition flex items-center gap-2">
+          <div class="w-8 h-8 bg-brand text-white rounded-full flex items-center justify-center shadow-md">
+            <i class="fa-solid fa-basket-shopping text-sm"></i>
+          </div>
+          <div class="flex flex-col items-start leading-none">
+            <span class="text-[10px] text-gray-500 font-bold uppercase">Sepetim</span>
+            <span id="header-cart-total" class="text-sm font-bold text-brand">€0.00</span>
+          </div>
+          <span id="cart-badge-desktop" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full hidden">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- TASTE DROPDOWN (Ülkeler) -->
+  <div id="taste-dropdown" class="hidden fixed top-16 left-0 right-0 z-50">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-xl p-4">
+        <div class="flex items-center justify-between gap-3 mb-3">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-globe text-gray-400"></i>
+            <div class="font-bold text-gray-800">Taste of Home</div>
+            <span class="text-xs font-bold bg-gray-50 border border-gray-200 px-2 py-1 rounded-full">Hangi ülkeyi özledin?</span>
+          </div>
+          <button onclick="toggleTasteDropdown(false)" class="text-gray-400 hover:text-gray-700 font-bold text-sm">
+            Kapat <i class="fa-solid fa-xmark ml-1"></i>
+          </button>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button class="country-chip" data-country="all" onclick="setCountryFilter('all')">🌍 Hepsi</button>
+          <button class="country-chip" data-country="tr" onclick="setCountryFilter('tr')">🇹🇷 Türkiye</button>
+          <button class="country-chip" data-country="it" onclick="setCountryFilter('it')">🇮🇹 İtalya</button>
+          <button class="country-chip" data-country="es" onclick="setCountryFilter('es')">🇪🇸 İspanya</button>
+          <button class="country-chip" data-country="in" onclick="setCountryFilter('in')">🇮🇳 Hindistan</button>
+          <button class="country-chip" data-country="jp" onclick="setCountryFilter('jp')">🇯🇵 Japonya</button>
+        </div>
+
+        <div class="mt-4 border-t pt-4">
+          <div class="flex flex-wrap gap-2" id="sticky-pills-clone"></div>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <button onclick="openThemePage('helal')" class="theme-pill"><span class="icon bg-helal-light text-helal"><i class="fa-solid fa-shield-halved"></i></span><span class="t"><b>Helal</b><small>Helal odaklı ürünler</small></span></button>
+            <button onclick="openThemePage('vegan')" class="theme-pill"><span class="icon bg-vegan-light text-vegan"><i class="fa-solid fa-seedling"></i></span><span class="t"><b>Vegan</b><small>Bitkisel seçenekler</small></span></button>
+            <button onclick="openThemePage('noel')" class="theme-pill"><span class="icon bg-noel-light text-noel"><i class="fa-solid fa-gift"></i></span><span class="t"><b>Noel</b><small>Özel gün menüleri</small></span></button>
+            <button onclick="openThemePage('ramadan')" class="theme-pill"><span class="icon bg-ramadan-light text-ramadan"><i class="fa-solid fa-moon"></i></span><span class="t"><b>Ramazan</b><small>İftar & sahur</small></span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- HOME -->
+  <div id="home-view">
+    <!-- Hero slider -->
+    <section class="relative w-full overflow-hidden h-[350px] md:h-[400px] bg-gray-900 group">
+      <div id="slider-track" class="slider-track flex h-full w-full">
+        <div class="min-w-full h-full relative">
+          <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1600" class="w-full h-full object-cover opacity-60">
+          <div class="absolute inset-0 flex flex-col justify-center items-center text-center text-white p-4">
+            <span class="bg-brand text-white text-xs font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-wider">Haftalık Abonelik</span>
+            <h2 class="text-3xl md:text-5xl font-serif font-bold mb-4 drop-shadow-lg">Haftalık Menünü Oluştur</h2>
+            <button onclick="openModal('weekly_subscription')" class="bg-white text-gray-900 hover:bg-brand hover:text-white px-8 py-3 rounded-full font-bold transition shadow-lg">
+              Aboneliği Dene
+            </button>
+          </div>
+        </div>
+
+        <div class="min-w-full h-full relative">
+          <img src="https://images.unsplash.com/photo-1588612762283-c286e9273cba?w=1600" class="w-full h-full object-cover opacity-60">
+          <div class="absolute inset-0 flex flex-col justify-center items-center text-center text-white p-4">
+            <span class="bg-green-700 text-white text-xs font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-wider">Ramazan Özel</span>
+            <h2 class="text-3xl md:text-5xl font-serif font-bold mb-4 drop-shadow-lg">İftar Sofraları Hazır</h2>
+            <button onclick="openModal('menu_ramadan')" class="bg-white text-gray-900 hover:bg-green-700 hover:text-white px-8 py-3 rounded-full font-bold transition shadow-lg">
+              İftar Menüsü
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="prevSlide()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center transition">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <button onclick="nextSlide()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center transition">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </section>
+
+    <!-- Best deals -->
+    <section id="best-deals-section" class="hidden">
+      <div class="max-w-7xl mx-auto px-4 pt-6">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-fire text-brand"></i>
+            <h3 class="text-lg font-bold text-gray-800">En iyi indirimler</h3>
+            <span id="best-deals-count" class="text-xs font-bold bg-orange-50 text-brand px-2 py-1 rounded-full border border-orange-100">0</span>
+          </div>
+          <button onclick="renderProducts('deals'); scrollToGrid();" class="text-sm font-bold text-brand hover:underline">
+            Hepsini gör <i class="fa-solid fa-chevron-right text-xs ml-1"></i>
+          </button>
+        </div>
+        <div id="best-deals-row" class="flex gap-4 overflow-x-auto pb-2 hide-scrollbar"></div>
+      </div>
+    </section>
+    
+
+
+    <!-- Taste of Home (moved to header dropdown) -->
+    <section class="max-w-7xl mx-auto px-4 pt-6 hidden">
+      <div class="bg-white border border-gray-200 rounded-2xl p-5">
+        <div class="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-earth-europe text-gray-400"></i>
+              <h3 class="text-lg font-bold text-gray-800">Taste of Home</h3>
+              <span class="text-xs font-bold bg-gray-50 border border-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                Hangi ülkeyi özledin?
+              </span>
+            </div>
+            <p class="text-sm text-gray-500 mt-1">
+              Ülke seç → o ülkenin mutfağına ait şef ve yemekleri gör.
+            </p>
+          </div>
+          <button onclick="setCountryFilter('all')" class="text-sm font-bold text-brand hover:underline">
+            Filtreyi sıfırla
+          </button>
+        </div>
+
+        <div class="mt-4 flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+          <button class="country-chip active" id="chip-all" onclick="setCountryFilter('all')">🌍 Hepsi</button>
+          <button class="country-chip" id="chip-tr" onclick="setCountryFilter('TR')">🇹🇷 Türkiye</button>
+          <button class="country-chip" id="chip-it" onclick="setCountryFilter('IT')">🇮🇹 İtalya</button>
+          <button class="country-chip" id="chip-es" onclick="setCountryFilter('ES')">🇪🇸 İspanya</button>
+          <button class="country-chip" id="chip-in" onclick="setCountryFilter('IN')">🇮🇳 Hindistan</button>
+          <button class="country-chip" id="chip-jp" onclick="setCountryFilter('JP')">🇯🇵 Japonya</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <div id="home-sticky-menu" class="gp-bar"><div class="max-w-7xl mx-auto px-4"><div class="gp-row mb-6 justify-center md:justify-start">
+        <button data-filter="all" onclick="renderProducts('all')" class="filter-pill active" id="pill-all">Tümü</button>
+
+        <button data-filter="deals" onclick="renderProducts('deals')" class="filter-pill" id="pill-deals"><i class="fa-solid fa-bolt"></i> İndirimler</button>
+
+        <button data-filter="weekly" onclick="renderProducts('weekly')" class="filter-pill" id="pill-weekly"><i class="fa-solid fa-calendar-week"></i> Haftalık Abonelik</button>
+
+        <button data-filter="ramadan" onclick="renderProducts('ramadan')" class="filter-pill" id="pill-ramadan"><i class="fa-solid fa-moon"></i> Ramazan</button>
+
+        <button data-filter="main" onclick="renderProducts('main')" class="px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 font-medium text-sm hover:border-brand hover:text-brand transition">
+          Ana Yemek
+        </button>
+        <button data-filter="dessert" onclick="renderProducts('dessert')" class="px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 font-medium text-sm hover:border-brand hover:text-brand transition">
+          Tatlı
+        </button>
+        <!-- Tema Kısayolları (Tatlı yanında) -->
+        <div class="flex flex-nowrap gap-2 items-center">
+          <button onclick="openThemePage('helal')" class="bg-white border border-gray-200 hover:border-helal hover:text-helal px-3 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-helal-light text-helal flex items-center justify-center"><i class="fa-solid fa-shield-halved"></i></span>
+            <span class="leading-tight text-left">
+              <span class="block">Helal</span>
+              <span class="block text-[10px] text-gray-400 font-bold">Helal odaklı ürünler</span>
+            </span>
+          </button>
+          <button onclick="openThemePage('vegan')" class="bg-white border border-gray-200 hover:border-vegan hover:text-vegan px-3 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-vegan-light text-vegan flex items-center justify-center"><i class="fa-solid fa-seedling"></i></span>
+            <span class="leading-tight text-left">
+              <span class="block">Vegan</span>
+              <span class="block text-[10px] text-gray-400 font-bold">Bitkisel seçenekler</span>
+            </span>
+          </button>
+          <button onclick="openThemePage('noel')" class="bg-white border border-gray-200 hover:border-noel hover:text-noel px-3 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-noel-light text-noel flex items-center justify-center"><i class="fa-solid fa-gift"></i></span>
+            <span class="leading-tight text-left">
+              <span class="block">Noel</span>
+              <span class="block text-[10px] text-gray-400 font-bold">Özel gün menüleri</span>
+            </span>
+          </button>
+          <button onclick="openThemePage('ramadan')" class="bg-white border border-gray-200 hover:border-ramadan hover:text-ramadan px-3 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-ramadan-light text-ramadan flex items-center justify-center"><i class="fa-solid fa-moon"></i></span>
+            <span class="leading-tight text-left">
+              <span class="block">Ramazan</span>
+              <span class="block text-[10px] text-gray-400 font-bold">İftar & sahur</span>
+            </span>
+          </button>
+        </div>
+
+
+        </div></div>
+
+      <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+    </main>
+  </div>
+
+  <!-- THEMES -->
+  <div id="themes-view" class="hidden pb-10">
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">Temalar</h2>
+          <p class="text-sm text-gray-500">Tema sayfasına girince header o temaya göre değişir (demo).</p>
+        </div>
+        <button onclick="goHome()" class="bg-gray-900 hover:bg-brand text-white px-4 py-2 rounded-lg font-bold transition">
+          <i class="fa-solid fa-arrow-left mr-2"></i>Ana Sayfa
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <button onclick="openThemePage('helal')" class="bg-white border border-gray-200 rounded-2xl p-5 text-left hover:shadow-lg transition">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-helal-light text-helal flex items-center justify-center">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+              <div class="font-bold text-gray-800">Helal</div>
+              <div class="text-xs text-gray-500">Helal odaklı ürünler</div>
+            </div>
+          </div>
+        </button>
+
+        <button onclick="openThemePage('vegan')" class="bg-white border border-gray-200 rounded-2xl p-5 text-left hover:shadow-lg transition">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-vegan-light text-vegan flex items-center justify-center">
+              <i class="fa-solid fa-seedling"></i>
+            </div>
+            <div>
+              <div class="font-bold text-gray-800">Vegan</div>
+              <div class="text-xs text-gray-500">Bitkisel seçenekler</div>
+            </div>
+          </div>
+        </button>
+
+        <button onclick="openThemePage('noel')" class="bg-white border border-gray-200 rounded-2xl p-5 text-left hover:shadow-lg transition">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-noel-light text-noel flex items-center justify-center">
+              <i class="fa-solid fa-gift"></i>
+            </div>
+            <div>
+              <div class="font-bold text-gray-800">Noel</div>
+              <div class="text-xs text-gray-500">Özel gün menüleri</div>
+            </div>
+          </div>
+        </button>
+
+        <button onclick="openThemePage('ramadan')" class="bg-white border border-gray-200 rounded-2xl p-5 text-left hover:shadow-lg transition">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-ramadan-light text-ramadan flex items-center justify-center">
+              <i class="fa-solid fa-moon"></i>
+            </div>
+            <div>
+              <div class="font-bold text-gray-800">Ramazan</div>
+              <div class="text-xs text-gray-500">İftar & sahur</div>
+            </div>
+          </div>
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <!-- THEME PAGE -->
+  <div id="theme-page-view" class="hidden pb-10">
+    <section class="relative overflow-hidden h-[240px] bg-gray-900">
+      <img id="theme-hero-img" src="" class="w-full h-full object-cover opacity-40">
+      <div class="absolute inset-0 flex items-end">
+        <div class="max-w-7xl mx-auto w-full px-4 pb-6">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <div id="theme-chip" class="inline-flex items-center gap-2 text-xs font-bold px-3 py-1 rounded-full border"></div>
+              <h2 id="theme-title" class="text-3xl md:text-4xl font-serif font-bold text-white mt-3"></h2>
+              <p id="theme-desc" class="text-gray-200 text-sm mt-2 max-w-2xl"></p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="goRequestWithTheme(currentThemeKey)"
+                class="bg-white/15 hover:bg-white/25 text-white px-4 py-2 rounded-lg font-bold transition border border-white/10">
+                <i class="fa-solid fa-clipboard-list mr-2"></i>Özel Talep Ver
+              </button>
+              <button onclick="openThemes()"
+                class="bg-white/15 hover:bg-white/25 text-white px-4 py-2 rounded-lg font-bold transition border border-white/10">
+                <i class="fa-solid fa-arrow-left mr-2"></i>Temalar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <div class="flex flex-wrap gap-2 mb-8" data-sticky-pills>
+        <button onclick="renderThemeProducts('all')" class="px-5 py-2 rounded-full bg-gray-800 text-white font-medium text-sm shadow-md">Tümü</button>
+        <button onclick="renderThemeProducts('deals')" class="px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-700 font-bold text-sm hover:border-brand hover:text-brand transition">
+          <i class="fa-solid fa-bolt mr-1"></i> İndirimdekiler
+        </button>
+      </div>
+
+      <div id="theme-product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+    </main>
+  </div>
+
+  <!-- REQUESTS VIEW -->
+  <div id="requests-view" class="hidden pb-10">
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">Özel Menü Talepleri</h2>
+          <p class="text-sm text-gray-500">Kullanıcı sadece “kaç şef teklif verdi” görür. Şef isimleri görünmez.</p>
+        </div>
+        <button onclick="goHome()" class="bg-gray-900 hover:bg-brand text-white px-4 py-2 rounded-lg font-bold transition">
+          <i class="fa-solid fa-arrow-left mr-2"></i>Ana Sayfa
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Create request -->
+        <div class="bg-white border border-gray-200 rounded-2xl p-5">
+          <h3 class="font-bold text-gray-800 mb-4">Yeni Talep Oluştur</h3>
+
+          <label class="text-xs font-bold text-gray-500 uppercase">Talep Tipi</label>
+          <select id="req-type" class="w-full border rounded-lg p-2 text-sm mt-1 mb-3" onchange="prefillRequestTemplate()">
+            <option value="ramadan_event">Ramazan Daveti (4 kişilik)</option>
+            <option value="athlete_week">Sporcu Menüsü (1 hafta / kalori hedefli)</option>
+            <option value="birthday">Doğum Günü (pasta + ikramlık)</option>
+            <option value="asian">Asya Yemeği (özel istek)</option>
+            <option value="custom">Kendi Notum (serbest)</option>
+          </select>
+
+          <label class="text-xs font-bold text-gray-500 uppercase">Başlık</label>
+          <input id="req-title" class="w-full border rounded-lg p-2 text-sm mt-1 mb-3" placeholder="Örn: Ramazan davetim için 4 kişilik menü" />
+
+          <label class="text-xs font-bold text-gray-500 uppercase">Detay</label>
+          <textarea id="req-detail" class="w-full border rounded-lg p-2 text-sm mt-1 mb-3 min-h-[120px]" placeholder="İstekleri yazın..."></textarea>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs font-bold text-gray-500 uppercase">Kişi</label>
+              <input id="req-people" type="number" min="1" value="4" class="w-full border rounded-lg p-2 text-sm mt-1" />
+            </div>
+            <div>
+              <label class="text-xs font-bold text-gray-500 uppercase">Bütçe (€/)</label>
+              <input id="req-budget" type="number" min="0" value="0" class="w-full border rounded-lg p-2 text-sm mt-1" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 mt-3">
+            <div>
+              <label class="text-xs font-bold text-gray-500 uppercase">Tarih</label>
+              <input id="req-date" type="date" class="w-full border rounded-lg p-2 text-sm mt-1" />
+            </div>
+            <div>
+              <label class="text-xs font-bold text-gray-500 uppercase">Tema</label>
+              <select id="req-theme" onchange="updateRequestThemeLinkUI()" class="w-full border rounded-lg p-2 text-sm mt-1">
+                <option value="none">Yok</option>
+                <option value="helal">Helal</option>
+                <option value="vegan">Vegan</option>
+                <option value="noel">Noel</option>
+                <option value="ramadan">Ramazan</option>
+              </select>
+
+              <div class="mt-2 flex items-center gap-2">
+                <button id="req-theme-link"
+                        onclick="goThemeFromRequest()"
+                        class="hidden bg-white border border-gray-200 hover:border-brand hover:text-brand px-3 py-2 rounded-lg text-xs font-bold transition">
+                  <i class="fa-solid fa-arrow-up-right-from-square mr-2"></i>Seçili temaya git
+                </button>
+                <span id="req-theme-hint" class="text-xs text-gray-400 hidden">Tema sayfası açılır.</span>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="createRequest()" class="mt-4 w-full bg-gray-900 hover:bg-brand text-white py-2 rounded-lg font-bold transition">
+            <i class="fa-solid fa-paper-plane mr-2"></i>Talebi Yayınla
+          </button>
+
+          <button onclick="seedRequests()" class="mt-2 w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg font-bold transition">
+            Örnek Talepler Yükle (Demo)
+          </button>
+        </div>
+
+        <!-- Requests list -->
+        <div class="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-gray-800">Açık Talepler</h3>
+            <button onclick="clearRequests()" class="text-sm font-bold text-gray-500 hover:text-red-600">
+              <i class="fa-solid fa-trash mr-1"></i>Temizle
+            </button>
+          </div>
+          <div id="req-list" class="space-y-3"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- CHEF PANEL -->
+  <div id="chef-panel-view" class="hidden pb-10">
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">Şef Paneli</h2>
+          <p class="text-sm text-gray-500">Şefler teklif verir. Kullanıcı yalnızca teklif sayısını görür.</p>
+        </div>
+        <button onclick="goHome()" class="bg-gray-900 hover:bg-brand text-white px-4 py-2 rounded-lg font-bold transition">
+          <i class="fa-solid fa-arrow-left mr-2"></i>Ana Sayfa
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white border border-gray-200 rounded-2xl p-5">
+          <h3 class="font-bold text-gray-800 mb-4">Teklif Ver (Demo)</h3>
+
+          <label class="text-xs font-bold text-gray-500 uppercase">Şef</label>
+          <select id="offer-chef" class="w-full border rounded-lg p-2 text-sm mt-1 mb-3"></select>
+
+          <label class="text-xs font-bold text-gray-500 uppercase">Talep</label>
+          <select id="offer-request" onchange="fillOfferTemplate(); autoSuggestETA();" class="w-full border rounded-lg p-2 text-sm mt-1 mb-3"></select>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs font-bold text-gray-500 uppercase">Fiyat (€)</label>
+              <input id="offer-price" type="number" min="1" value="0" class="w-full border rounded-lg p-2 text-sm mt-1" />
+            </div>
+            <div>
+              <label class="text-xs font-bold text-gray-500 uppercase">Süre (ETA)</label>
+              <select id="offer-eta" class="w-full border rounded-lg p-2 text-sm mt-1">
+                <option value="Aynı gün">Aynı gün</option>
+                <option value="24 saat">24 saat</option>
+                <option value="24-48 saat">24-48 saat</option>
+                <option value="48 saat">48 saat</option>
+                <option value="2-3 gün">2-3 gün</option>
+                <option value="24-72 saat">24-72 saat</option>
+              </select>
+            </div>
+          </div>
+
+          <label class="text-xs font-bold text-gray-500 uppercase mt-3">Not (şef içi)</label>
+          <textarea id="offer-note" class="w-full border rounded-lg p-2 text-sm mt-1 min-h-[110px]" placeholder="Teklif notu..."></textarea>
+
+          <button onclick="submitOffer()" class="mt-4 w-full bg-gray-900 hover:bg-brand text-white py-2 rounded-lg font-bold transition">
+            <i class="fa-solid fa-hand-holding-dollar mr-2"></i>Teklif Gönder
+          </button>
+        </div>
+
+        <div class="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-gray-800">Teklifler (Şef tarafı)</h3>
+            <button onclick="clearOffers()" class="text-sm font-bold text-gray-500 hover:text-red-600">
+              <i class="fa-solid fa-trash mr-1"></i>Temizle
+            </button>
+          </div>
+          <div id="offer-list" class="space-y-3"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ACTIE VIEW -->
+  <div id="actie-view" class="hidden pb-10">
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <div class="flex items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">Acties (İndirimler)</h2>
+          <p class="text-sm text-gray-500">Şefler kendi ürünlerine indirim tanımlayabilir. (localStorage demo)</p>
+        </div>
+        <button onclick="goHome()" class="bg-gray-900 hover:bg-brand text-white px-4 py-2 rounded-lg font-bold transition">
+          <i class="fa-solid fa-arrow-left mr-2"></i>Ana Sayfa
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white border border-gray-200 rounded-2xl p-5">
+          <h3 class="font-bold text-gray-800 mb-4">İndirim Oluştur</h3>
+
+          <label class="text-xs font-bold text-gray-500 uppercase">Şef</label>
+          <select id="actie-chef" class="w-full border rounded-lg p-2 text-sm mt-1 mb-3" onchange="renderActieProductPicker()"></select>
+
+          <label class="text-xs font-bold text-gray-500 uppercase">Kapsam</label>
+          <select id="actie-scope" class="w-full border rounded-lg p-2 text-sm mt-1 mb-3" onchange="renderActieProductPicker()">
+            <option value="all">Tüm ürünler</option>
+            <option value="selected">Seçili ürünler</option>
+          </select>
+
+          <div id="actie-product-picker" class="hidden mb-3">
+            <label class="text-xs font-bold text-gray-500 uppercase">Ürünler</label>
+            <div id="actie-products" class="mt-2 space-y-2 max-h-40 overflow-auto border rounded-lg p-2"></div>
+          </div>
+
+          <label class="text-xs font-bold text-gray-500 uppercase">İndirim Oranı (%)</label>
+          <input id="actie-percent" type="number" min="1" max="90" value="10" class="w-full border rounded-lg p-2 text-sm mt-1 mb-3"/>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs font-bold text-gray-500 uppercase">Başlangıç</label>
+              <input id="actie-start" type="date" class="w-full border rounded-lg p-2 text-sm mt-1"/>
+            </div>
+            <div>
+              <label class="text-xs font-bold text-gray-500 uppercase">Bitiş</label>
+              <input id="actie-end" type="date" class="w-full border rounded-lg p-2 text-sm mt-1"/>
+            </div>
+          </div>
+
+          <button onclick="saveActie()" class="mt-4 w-full bg-gray-900 hover:bg-brand text-white py-2 rounded-lg font-bold transition">
+            <i class="fa-solid fa-floppy-disk mr-2"></i>Kaydet
+          </button>
+
+          <button onclick="clearActies()" class="mt-2 w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg font-bold transition">
+            Temizle (Demo)
+          </button>
+        </div>
+
+        <div class="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-5">
+          <h3 class="font-bold text-gray-800 mb-4">Aktif İndirimler</h3>
+          <div id="actie-list" class="space-y-3"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- CHEF PROFILE -->
+  <div id="chef-view" class="hidden pb-10">
+    <div class="relative h-72 bg-gray-900">
+      <img id="chef-cover-img" src="" class="w-full h-full object-cover opacity-30">
+      <div class="absolute inset-0 flex flex-col justify-end p-6 md:p-10 max-w-7xl mx-auto">
+        <button onclick="goHome()" class="absolute top-4 left-4 bg-white/20 hover:bg-white/40 text-white px-4 py-2 rounded-lg backdrop-blur text-sm font-bold transition flex items-center gap-2">
+          <i class="fa-solid fa-arrow-left"></i> Ana Sayfa
+        </button>
+
+        <div class="flex flex-col md:flex-row md:items-end gap-6">
+          <img id="chef-profile-img" src="" class="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-xl bg-gray-200 object-cover">
+          <div class="text-white mb-2 flex-1">
+            <h1 id="chef-profile-name" class="text-3xl md:text-4xl font-serif font-bold"></h1>
+            <div id="chef-badges" class="flex flex-wrap gap-2 mt-2"></div>
+            <p id="chef-bio" class="text-gray-200 text-sm mt-3 max-w-2xl leading-relaxed"></p>
+          </div>
+
+          <div class="flex gap-6 text-center bg-white/10 backdrop-blur rounded-xl p-3 border border-white/10 flex-wrap">
+            <div><div class="text-2xl font-bold text-brand" id="chef-years"></div><div class="text-[10px] text-gray-300 uppercase">Yıldır</div></div>
+            <div class="w-px bg-white/20 hidden md:block"></div>
+            <div><div class="text-2xl font-bold text-yellow-400" id="chef-rating-big"></div><div class="text-[10px] text-gray-300 uppercase">Puan</div></div>
+            <div class="w-px bg-white/20 hidden md:block"></div>
+            <div><div class="text-2xl font-bold text-white" id="chef-origin"></div><div class="text-[10px] text-gray-300 uppercase">Mutfağı</div></div>
+            <div class="w-px bg-white/20 hidden md:block"></div>
+            <div><div class="text-2xl font-bold text-white" id="chef-weekly"></div><div class="text-[10px] text-gray-300 uppercase">Bu Hafta</div></div>
+            <div class="w-px bg-white/20 hidden md:block"></div>
+            <div><div class="text-2xl font-bold text-white" id="chef-subs"></div><div class="text-[10px] text-gray-300 uppercase">Abone</div></div>
+            <div class="w-px bg-white/20 hidden md:block"></div>
+            <div><div class="text-2xl font-bold text-white" id="chef-height"></div><div class="text-[10px] text-gray-300 uppercase">Boy (cm)</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <!-- Expanded chef details -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div class="lg:col-span-2 space-y-6">
+          <div class="bg-white border border-gray-200 rounded-2xl p-5">
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-id-card text-gray-400"></i>
+                <h3 class="text-lg font-bold text-gray-800">Şef Hakkında</h3>
+              </div>
+              <div class="flex gap-2 flex-wrap">
+                <span id="chef-profession-badge" class="chef-badge badge-blue"></span>
+                <span id="chef-langs-badge" class="chef-badge badge-purple"></span>
+              </div>
+            </div>
+            <div class="mt-3 text-sm text-gray-600 leading-relaxed" id="chef-about-long"></div>
+
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                <div class="text-xs font-extrabold text-gray-500 uppercase mb-2">
+                  <i class="fa-solid fa-graduation-cap mr-2"></i>Okullar / Eğitim
+                </div>
+                <ul id="chef-schools" class="text-sm text-gray-700 space-y-1"></ul>
+              </div>
+              <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                <div class="text-xs font-extrabold text-gray-500 uppercase mb-2">
+                  <i class="fa-solid fa-certificate mr-2"></i>Sertifikalar
+                </div>
+                <ul id="chef-certs" class="text-sm text-gray-700 space-y-1"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white border border-gray-200 rounded-2xl p-5">
+            <div class="flex items-center gap-2 mb-3">
+              <i class="fa-solid fa-kitchen-set text-gray-400"></i>
+              <h3 class="text-lg font-bold text-gray-800">Mutfak Galerisi</h3>
+              <span class="text-xs font-bold bg-gray-50 border border-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                Şeffaflık & hijyen
+              </span>
+            </div>
+            <div id="chef-kitchen-gallery" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="bg-white border border-gray-200 rounded-2xl p-5">
+            <div class="flex items-center gap-2 mb-3">
+              <i class="fa-solid fa-toolbox text-gray-400"></i>
+              <h3 class="text-lg font-bold text-gray-800">Kullandığı Ekipman</h3>
+            </div>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+              <div class="text-xs font-extrabold text-gray-500 uppercase mb-2">
+                <i class="fa-solid fa-box-open mr-2"></i>Bakye / Tepsi (Demo)
+              </div>
+              <div class="flex items-start gap-3">
+                <img src="bakeware_tray.png" alt="Bakeware Tray"
+                     class="w-24 h-24 object-contain bg-white rounded-xl border border-gray-200 p-2">
+                <div class="text-sm text-gray-700 leading-relaxed">
+                  <div class="font-extrabold text-gray-800">Alüminyum Servis Tepsisi</div>
+                  <div class="text-xs text-gray-500 mt-1">
+                    Paketleme/servis için (demo görsel). Aynı klasöre
+                    <b>bakeware_tray.png</b> ismiyle kaydedin.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
+              <div class="text-xs font-extrabold text-gray-500 uppercase mb-2">
+                <i class="fa-solid fa-shield-heart mr-2"></i>Avrupa Standardı Notu
+              </div>
+              <p class="text-sm text-gray-700 leading-relaxed">
+                Şef profillerinde hijyen, alerjen şeffaflığı, sürdürülebilirlik ve kültürel
+                otantiklik vurgusu Avrupa kullanıcı güvenini ciddi şekilde artırır.
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-white border border-gray-200 rounded-2xl p-5">
+            <div class="flex items-center gap-2 mb-3">
+              <i class="fa-solid fa-star text-gray-400"></i>
+              <h3 class="text-lg font-bold text-gray-800">Deneyim Özeti</h3>
+            </div>
+            <div id="chef-experience" class="text-sm text-gray-700 leading-relaxed"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 mb-6 border-b border-gray-200 pb-4">
+        <i class="fa-solid fa-utensils text-gray-400"></i>
+        <h2 class="text-xl font-bold text-gray-800">Şefin Ürünleri</h2>
+      </div>
+      <div id="chef-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+    </main>
+  </div>
+
+  
+  <!-- WELCOME POPUP (Açılış) -->
+  <div id="welcome-overlay" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl relative">
+      <button onclick="closeWelcome()" class="absolute top-4 right-4 z-20 bg-white/90 p-2 rounded-full hover:bg-gray-100 text-gray-600 shadow-md transition">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+      <div class="p-6 border-b">
+        <div class="flex items-center gap-2 text-xs font-extrabold uppercase text-brand">
+          <i class="fa-solid fa-sparkles"></i> Bugün Denemek İster misin?
+        </div>
+        <h3 class="text-2xl font-bold text-gray-800 mt-2">Seçili öneri</h3>
+        <p class="text-sm text-gray-500 mt-1">Hemen bir ürünü dene. İstersen sonra kapatabilirsin.</p>
+      </div>
+      <div class="p-6">
+        <div id="welcome-card"></div>
+        <div class="mt-5 flex flex-col sm:flex-row gap-3">
+          <button onclick="tryWelcome()" class="flex-1 bg-gray-900 hover:bg-brand text-white py-3 rounded-xl font-bold transition">
+            <i class="fa-solid fa-basket-shopping mr-2"></i>Denemek istiyorum
+          </button>
+          <button onclick="closeWelcome()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-bold transition">
+            Daha sonra
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- COMPARE OVERLAY -->
+  <div id="compare-overlay" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl relative">
+      <button onclick="closeCompare()" class="absolute top-4 right-4 z-20 bg-white/90 p-2 rounded-full hover:bg-gray-100 text-gray-600 shadow-md transition">        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+      <div class="p-6 border-b">
+        <h3 class="text-xl font-bold text-gray-800">Şef Kıyaslama</h3>
+        <p class="text-sm text-gray-500">Puan, rozet, haftalık teslim ve abone sayısı.</p>
+      </div>
+      <div class="p-6 overflow-y-auto max-h-[75vh]">
+        <div id="compare-table" class="space-y-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal-overlay" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="modal-box" class="bg-white rounded-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden flex flex-col md:flex-row shadow-2xl relative">
+      <button onclick="closeModal()" class="absolute top-4 right-4 z-20 bg-white/90 p-2 rounded-full hover:bg-gray-100 text-gray-600 shadow-md transition">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+
+      <div class="w-full md:w-4/12 bg-gray-100 relative h-48 md:h-auto flex-shrink-0">
+        <img id="m-img" src="" class="w-full h-full object-cover">
+        <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/90 to-transparent p-6">
+          <div class="flex items-center gap-3 text-white">
+            <img id="m-chef-img" src="" class="w-12 h-12 rounded-full border-2 border-white">
+            <div>
+              <p class="text-xs opacity-80">Hazırlayan</p>
+              <p id="m-chef-name" class="font-bold text-sm"></p>
+              <div class="flex items-center gap-1 text-xs text-brand-light mt-0.5"><i class="fa-solid fa-location-dot"></i> <span id="m-location"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-full md:w-8/12 flex flex-col bg-white h-full max-h-[95vh]">
+        <div class="flex items-center gap-6 px-6 pt-6 border-b border-gray-100 flex-shrink-0">
+          <button onclick="switchTab('details')" id="btn-tab-details" class="tab-btn active text-sm font-medium">Detay</button>
+          <button onclick="switchTab('reviews')" id="btn-tab-reviews" class="tab-btn text-sm font-medium">
+            Yorumlar <span id="m-review-count" class="text-xs bg-gray-100 px-1.5 py-0.5 rounded-full ml-1">0</span>
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6">
+          <div id="content-details">
+            <div class="flex justify-between items-start mb-2">
+              <h2 id="m-title" class="text-2xl font-serif font-bold text-gray-800 leading-tight"></h2>
+              <div class="text-right">
+                <span id="m-base-price" class="text-xl font-bold text-brand bg-orange-50 px-2 py-1 rounded"></span>
+                <div id="m-weekly-calories" class="hidden mt-2 inline-flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">
+                  <i class="fa-solid fa-chart-pie"></i> Haftalık: <span id="m-cal-val">0</span> kcal
+                </div>
+                <div id="m-discount-line" class="hidden mt-2 text-xs font-bold text-brand bg-orange-50 border border-orange-100 px-2 py-1 rounded">
+                  <span id="m-discount-text"></span>
+                </div>
+              </div>
+            </div>
+            <p id="m-desc" class="text-gray-500 text-sm leading-relaxed mb-4"></p>
+            <div id="dynamic-content-area" class="space-y-4"></div>
+          </div>
+
+          <div id="content-reviews" class="hidden space-y-4">
+            <div id="reviews-list" class="space-y-4"></div>
+          </div>
+        </div>
+
+        <div id="modal-footer" class="p-4 border-t border-gray-100 bg-gray-50 flex-shrink-0">
+          <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div class="flex bg-white rounded-lg border border-gray-200 p-1 w-full sm:w-auto">
+              <button onclick="setDelivery('pickup')" id="btn-pickup" class="flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded bg-gray-100 text-gray-800 shadow-sm transition">Gel-Al</button>
+              <button onclick="setDelivery('delivery')" id="btn-delivery" class="flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded text-gray-400 hover:text-gray-800 transition">Eve Teslim</button>
+            </div>
+
+            <div class="flex gap-4 w-full sm:w-auto">
+              <div id="qty-container" class="hidden flex items-center bg-white border border-gray-300 rounded-lg shadow-sm">
+                <button onclick="updateQty(-1)" class="w-10 h-full text-gray-500 hover:text-brand font-bold text-lg">-</button>
+                <span id="m-qty" class="w-8 text-center font-bold text-gray-800">1</span>
+                <button onclick="updateQty(1)" class="w-10 h-full text-gray-500 hover:text-brand font-bold text-lg">+</button>
+              </div>
+
+              <button onclick="addToCart()" id="btn-add-cart"
+                class="flex-1 bg-gray-900 hover:bg-brand text-white h-12 rounded-lg font-bold shadow-lg transition-all flex justify-between items-center px-6 min-w-[200px]">
+                <span>Sepete Ekle</span><span id="m-total-price">€0.00</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- WELCOME POPUP (Açılış) -->
+  <div id="welcome-overlay" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl relative">
+      <button onclick="closeWelcome()" class="absolute top-4 right-4 z-20 bg-white/90 p-2 rounded-full hover:bg-gray-100 text-gray-600 shadow-md transition">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+      <div class="relative h-52 bg-gray-100">
+        <img id="welcome-img" src="https://images.unsplash.com/photo-1543353071-873f17a7a088?w=1200" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+        <div class="absolute bottom-4 left-4 right-4 text-white">
+          <div class="text-xs font-extrabold bg-white/15 inline-flex px-3 py-1 rounded-full border border-white/10">
+            Bugün denemek ister misin?
+          </div>
+          <div id="welcome-title" class="mt-2 text-2xl font-serif font-bold">Seçili Ürün</div>
+          <div id="welcome-sub" class="text-sm text-white/90 mt-1">Hızlıca sepete ekleyebilirsin veya detayına bakabilirsin.</div>
+        </div>
+      </div>
+      <div class="p-5">
+        <div class="flex items-center justify-between gap-3">
+          <div class="text-sm text-gray-600">
+            <span class="font-bold">Öneri:</span> <span id="welcome-chef">—</span>
+          </div>
+          <div class="text-sm font-extrabold text-brand" id="welcome-price">€0.00</div>
+        </div>
+        <div class="mt-4 flex gap-2">
+          <button onclick="openWelcomeProduct()" class="flex-1 bg-gray-900 hover:bg-brand text-white py-3 rounded-xl font-extrabold transition">
+            Ürünü İncele
+          </button>
+          <button onclick="skipWelcomeToday()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-extrabold transition">
+            Bugün geç
+          </button>
+        </div>
+        <div class="mt-3 text-[11px] text-gray-400 font-bold">
+          Bu popup gün içinde bir kez gösterilir (demo).
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- CHECKOUT MINI (Sepete Ekle sonrası) -->
+  <div id="checkout-mini" class="fixed inset-0 z-[55] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden relative">
+      <button onclick="closeCheckout()" class="absolute top-4 right-4 bg-white/90 p-2 rounded-full hover:bg-gray-100 text-gray-600 shadow-md transition">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+      <div class="p-6 border-b">
+        <div class="text-xs font-bold text-gray-500 uppercase">Siparişi Son Kez Özelleştir</div>
+        <div id="co-title" class="text-xl font-bold text-gray-800 mt-1"></div>
+        <div class="text-xs text-gray-500 mt-1">Teslim zamanı + not + opsiyonel eklemeler.</div>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="text-xs font-bold text-gray-500 uppercase">Teslim Zamanı</label>
+          <select id="co-time" class="w-full border rounded-lg p-2 text-sm mt-1">
+            <option value="En kısa">En kısa</option>
+            <option value="Bugün 18:00-19:00">Bugün 18:00-19:00</option>
+            <option value="Bugün 19:00-20:00">Bugün 19:00-20:00</option>
+            <option value="Yarın 12:00-14:00">Yarın 12:00-14:00</option>
+            <option value="Yarın 18:00-20:00">Yarın 18:00-20:00</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-gray-500 uppercase">İstek / Not</label>
+          <textarea id="co-note" class="w-full border rounded-lg p-2 text-sm mt-1 min-h-[90px]" placeholder="İstemediğin malzeme, daha acı/az acı, tuz az, vb."></textarea>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+          <div class="flex items-center justify-between">
+            <div class="font-bold text-gray-800 text-sm">Opsiyonel Eklemeler</div>
+            <div class="text-xs text-gray-500 font-bold">Fiyat otomatik güncellenir</div>
+          </div>
+          <div class="mt-3 space-y-2 text-sm">
+            <label class="flex items-center gap-2">
+              <input type="checkbox" class="co-addon" data-price="2.5" onchange="updateCheckoutTotal()">
+              <span>Ek sos / dip</span><span class="ml-auto font-bold text-gray-700">+€2.50</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input type="checkbox" class="co-addon" data-price="3" onchange="updateCheckoutTotal()">
+              <span>Ek porsiyon yanında</span><span class="ml-auto font-bold text-gray-700">+€3.00</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input type="checkbox" class="co-addon" data-price="1.5" onchange="updateCheckoutTotal()">
+              <span>Çatal-bıçak seti</span><span class="ml-auto font-bold text-gray-700">+€1.50</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6 border-t bg-white flex items-center justify-between gap-4">
+        <div>
+          <div class="text-xs text-gray-500 font-bold uppercase">Final</div>
+          <div id="co-total" class="text-2xl font-extrabold text-brand">€0.00</div>
+        </div>
+        <button onclick="confirmCheckout()" class="bg-gray-900 hover:bg-brand text-white px-6 py-3 rounded-xl font-bold transition shadow-lg">
+          Okey, başlat 🚀
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="gp-toast" class="hidden">
+    <div class="bg-gray-900 text-white px-5 py-3 rounded-full shadow-xl text-sm font-bold flex items-center gap-2">
+      <i class="fa-solid fa-kitchen-set"></i>
+      <span id="gp-toast-text">Hazırlanmaya başlıyor…</span>
+    </div>
+  </div>
+
+<script>
+  // ---------------- DATA ----------------
+  const DEFAULT_IMG = "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27800%27%20height%3D%27600%27%3E%0A%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%0A%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23f1f5f9%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23e2e8f0%27/%3E%3C/linearGradient%3E%3C/defs%3E%0A%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27url%28%23g%29%27/%3E%0A%3Ccircle%20cx%3D%27400%27%20cy%3D%27260%27%20r%3D%2790%27%20fill%3D%27%23ffffff%27%20opacity%3D%270.9%27/%3E%0A%3Ctext%20x%3D%27400%27%20y%3D%27270%27%20text-anchor%3D%27middle%27%20font-family%3D%27Inter%2CArial%27%20font-size%3D%2728%27%20fill%3D%27%2364748b%27%3EGastroPazar%3C/text%3E%0A%3Ctext%20x%3D%27400%27%20y%3D%27310%27%20text-anchor%3D%27middle%27%20font-family%3D%27Inter%2CArial%27%20font-size%3D%2716%27%20fill%3D%27%2394a3b8%27%3EG%C3%B6rsel%20yak%C4%B1nda%3C/text%3E%0A%3C/svg%3E";
+  function safeImg(u){ return (u && String(u).trim()) ? u : DEFAULT_IMG; }
+  function imgOnErrorAttr(){ return "this.onerror=null;this.src=DEFAULT_IMG;"; }
+
+  function updateHomeFilterUI(active){
+    const wrap = document.getElementById('home-sticky-menu');
+    if(!wrap) return;
+    wrap.querySelectorAll('button[data-filter]').forEach(b=>{
+      const f = b.getAttribute('data-filter');
+      const isActive = (f === active);
+      // base styles: keep current classes but toggle filled vs outline
+      if(isActive){
+        // make active: dark filled for 'all', brand filled for others
+        if(f==='all') b.className = "px-5 py-2 rounded-full bg-gray-800 text-white font-medium text-sm shadow-md";
+        else if(f==='ramadan') b.className = "px-5 py-2 rounded-full bg-green-700 text-white font-bold text-sm shadow-sm hover:opacity-90 transition flex items-center gap-2";
+        else b.className = "px-5 py-2 rounded-full bg-brand text-white font-bold text-sm shadow-sm hover:opacity-90 transition flex items-center gap-2";
+      } else {
+        // inactive: outline styles
+        if(f==='all') b.className = "px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-700 font-medium text-sm hover:border-brand hover:text-brand transition";
+        else if(f==='ramadan') b.className = "px-5 py-2 rounded-full bg-white border border-green-700 text-green-700 font-bold text-sm hover:bg-green-700 hover:text-white transition flex items-center gap-2";
+        else if(f==='weekly') b.className = "px-5 py-2 rounded-full bg-white border border-brand text-brand font-bold text-sm shadow-sm hover:bg-brand hover:text-white transition flex items-center gap-2";
+        else if(f==='deals') b.className = "px-5 py-2 rounded-full bg-white border border-brand text-brand font-bold text-sm shadow-sm hover:bg-brand hover:text-white transition flex items-center gap-2";
+        else b.className = "px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 font-medium text-sm hover:border-brand hover:text-brand transition";
+      }
+    });
+  }
+
+  const chefDB = {
+    ayse: {
+      name:"Ayşe'nin Mutfağı",
+      img:"https://randomuser.me/api/portraits/women/44.jpg",
+      bg:"https://images.unsplash.com/photo-1556910103-1c02745a30bf?w=1600",
+      location:"Rotterdam",
+      rating:4.9,
+      years:12,
+      origin:"Kayseri",
+      deliveredThisWeek:37,
+      subscribers:860,
+      profession:"Ev Şefi / Catering",
+      heightCm: 165,
+      languages:["TR","EN","NL"],
+      schools:[
+        "Kayseri Aşçılık Kursu (Sertifika Programı)",
+        "HACCP Temel Hijyen Eğitimi (Demo)"
+      ],
+      certificates:[
+        "HACCP / Food Safety (Demo)",
+        "Allergen Awareness (Demo)"
+      ],
+      aboutLong:
+        "Kayseri mutfağı temelli ev yemekleri yapıyorum. Avrupa merkezli kullanıcılar için alerjen şeffaflığı ve hijyen standartlarına özellikle dikkat ediyorum. Mantı, sarma ve tepsi börekleri en çok tercih edilen ürünlerim.",
+      experienceNote:
+        "12+ yıl deneyim • Toplu davet menüleri • Haftalık abonelik planları • Alerjen etiketleme ve içerik şeffaflığı",
+      kitchenPhotos:[
+        "https://images.unsplash.com/photo-1556910103-1c02745a30bf?w=1200",
+        "https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=1200",
+        "https://images.unsplash.com/photo-1556911220-e15b29be8c3a?w=1200"
+      ],
+      badges:[
+        {text:"🏆 Lezzet Ustası", color:"badge-gold"},
+        {text:"🥬 Taze", color:"badge-green"},
+        {text:"✅ Şeffaf İçerik", color:"badge-blue"}
+      ]
+    },
+    sultan: {
+      name:"Sultan Sofrası",
+      img:"https://randomuser.me/api/portraits/men/85.jpg",
+      bg:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600",
+      location:"Üsküdar",
+      rating:5.0,
+      years:25,
+      origin:"Osmanlı",
+      deliveredThisWeek:51,
+      subscribers:2140,
+      profession:"Geleneksel Şef / Davet Menüsü",
+      heightCm: 178,
+      languages:["TR","EN"],
+      schools:[
+        "Osmanlı Mutfağı Ustalık Programı (Demo)",
+        "Gıda Hijyeni Eğitimi (Demo)"
+      ],
+      certificates:[
+        "Ramazan Menü Uzmanlığı (Demo)",
+        "Allergen Awareness (Demo)"
+      ],
+      aboutLong:
+        "Geleneksel saray mutfağı esintileriyle iftar menüleri, şerbet ve tatlılarda uzmanım. Avrupa tüketicisi için porsiyonlama, teslimat zamanı ve içerik şeffaflığına özel süreç uygularım.",
+      experienceNote:
+        "25+ yıl deneyim • Ramazan paketleri • Özel gün tatlıları • Toplu davet organizasyonu",
+      kitchenPhotos:[
+        "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=1200",
+        "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=1200",
+        "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=1200"
+      ],
+      badges:[
+        {text:"🌙 Ramazan Özel", color:"badge-green"},
+        {text:"🛡️ Güvenilir", color:"badge-blue"},
+        {text:"🏛️ Otantik", color:"badge-gold"}
+      ]
+    },
+    deniz: {
+      name:"Deniz'in Ege Mutfağı",
+      img:"https://randomuser.me/api/portraits/women/68.jpg",
+      bg:"https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?w=1600",
+      location:"Delfshaven",
+      rating:4.7,
+      years:8,
+      origin:"İzmir",
+      deliveredThisWeek:29,
+      subscribers:640,
+      profession:"Ege Mutfağı / Zeytinyağlı Uzmanı",
+      heightCm: 170,
+      languages:["TR","EN","NL"],
+      schools:[
+        "Ege Mutfağı Atölye Programı (Demo)",
+        "Vegan Menü Atölyesi (Demo)"
+      ],
+      certificates:[
+        "Vegan Menü Planlama (Demo)",
+        "Allergen Awareness (Demo)"
+      ],
+      aboutLong:
+        "Ege’nin otları, zeytinyağlıları ve hafif tabaklarıyla öne çıkıyorum. Vegan/vejetaryen kullanıcılar için şeffaf içerik ve alternatif malzemelerde fiyat farkı gibi netlik sağlarım.",
+      experienceNote:
+        "8 yıl deneyim • Vegan seçenekler • Zeytinyağlılar • Hafif/fit menüler",
+      kitchenPhotos:[
+        "https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=1200",
+        "https://images.unsplash.com/photo-1556911220-e15b29be8c3a?w=1200",
+        "https://images.unsplash.com/photo-1543353071-873f17a7a088?w=1200"
+      ],
+      badges:[
+        {text:"🌿 Vegan Seçenek", color:"badge-green"},
+        {text:"♻️ Sürdürülebilir", color:"badge-blue"}
+      ]
+    },
+    karadeniz: {
+      name:"Karadeniz Rüzgarı",
+      img:"https://randomuser.me/api/portraits/men/32.jpg",
+      bg:"https://images.unsplash.com/photo-1574672280602-95cb48dad557?w=1600",
+      location:"Schiedam",
+      rating:4.9,
+      years:15,
+      origin:"Trabzon",
+      deliveredThisWeek:44,
+      subscribers:1210,
+      profession:"Yöresel Şef / Fırın Ürünleri",
+      heightCm: 182,
+      languages:["TR","EN"],
+      schools:[
+        "Fırıncılık & Hamur İşleri (Demo)",
+        "Gıda Güvenliği Temelleri (Demo)"
+      ],
+      certificates:[
+        "Hamur işleri ustalığı (Demo)",
+        "Allergen Awareness (Demo)"
+      ],
+      aboutLong:
+        "Karadeniz mutfağına ait pide ve yöresel lezzetleri ev yapımı tarzda sunuyorum. Gluten/süt gibi alerjenleri özellikle belirtirim.",
+      experienceNote:
+        "15 yıl deneyim • Pide/hamur işleri • Yöresel menüler",
+      kitchenPhotos:[
+        "https://images.unsplash.com/photo-1556910103-1c02745a30bf?w=1200",
+        "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=1200",
+        "https://images.unsplash.com/photo-1543353071-873f17a7a088?w=1200"
+      ],
+      badges:[
+        {text:"🐟 Yöresel", color:"badge-blue"},
+        {text:"🔥 Çok Satan", color:"badge-gold"}
+      ]
+    }
+  
+    ,maria: {
+      name:"Maria's Paella House",
+      img:"https://randomuser.me/api/portraits/women/12.jpg",
+      bg:"https://images.unsplash.com/photo-1604908811849-77b0d31589e3?w=1600",
+      location:"Amsterdam",
+      rating:4.8,
+      years:10,
+      origin:"Valencia",
+      chefOrigin:"ES",
+      profession:"Şef / Catering",
+      schools:"Escuela de Hostelería de Valencia (Demo)",
+      heightCm:168,
+      bio:"Valencia usulü paella ve tapas. Deniz ürünlerinde şeffaf içerik ve alerjen etiketleriyle çalışırım.",
+      badges:[{text:"🇪🇸 Authentic", color:"badge-gold"},{text:"🥘 Paella", color:"badge-blue"}],
+      deliveredThisWeek:33,
+      subscribers:720,
+      kitchenPhotos:[
+        "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1200",
+        "https://images.unsplash.com/photo-1556911073-52527ac437f5?w=1200"
+      ],
+      foodPhotos:[
+        "https://images.unsplash.com/photo-1604908811849-77b0d31589e3?w=1200",
+        "https://images.unsplash.com/photo-1604908811902-36f7c5b02d6d?w=1200"
+      ]
+    },
+    arjun: {
+      name:"Arjun's Indian Kitchen",
+      img:"https://randomuser.me/api/portraits/men/52.jpg",
+      bg:"https://images.unsplash.com/photo-1601050690597-df0568f70950?w=1600",
+      location:"Utrecht",
+      rating:4.7,
+      years:9,
+      origin:"Delhi",
+      chefOrigin:"IN",
+      profession:"Chef de Cuisine",
+      schools:"Institute of Hotel Management (Demo)",
+      heightCm:176,
+      bio:"Gerçek Hint körileri: baharat profili, acı seviyesi ve alerjenler net. Vegan seçenekler mevcut.",
+      badges:[{text:"🇮🇳 Authentic", color:"badge-gold"},{text:"🌶️ Spice", color:"badge-red"},{text:"🌿 Vegan opsiyon", color:"badge-green"}],
+      deliveredThisWeek:28,
+      subscribers:540,
+      kitchenPhotos:[
+        "https://images.unsplash.com/photo-1556912167-f556f1f39b4f?w=1200"
+      ],
+      foodPhotos:[
+        "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=1200",
+        "https://images.unsplash.com/photo-1600626333390-0a3f1f0e8e7c?w=1200"
+      ]
+    },
+    yuki: {
+      name:"Yuki's Tokyo Bento",
+      img:"https://randomuser.me/api/portraits/women/65.jpg",
+      bg:"https://images.unsplash.com/photo-1553621042-f6e147245754?w=1600",
+      location:"Rotterdam",
+      rating:4.9,
+      years:7,
+      origin:"Tokyo",
+      chefOrigin:"JP",
+      profession:"Sushi / Bento Chef",
+      schools:"Tokyo Culinary School (Demo)",
+      heightCm:160,
+      bio:"Bento ve ramen: porsiyon, makro ve içerik şeffaf. Balık tazeliği ve soğuk zincir öncelik.",
+      badges:[{text:"🇯🇵 Authentic", color:"badge-gold"},{text:"🍱 Bento", color:"badge-purple"}],
+      deliveredThisWeek:41,
+      subscribers:980,
+      kitchenPhotos:[
+        "https://images.unsplash.com/photo-1541544181074-e3f38fda1b2a?w=1200"
+      ],
+      foodPhotos:[
+        "https://images.unsplash.com/photo-1553621042-f6e147245754?w=1200",
+        "https://images.unsplash.com/photo-1562158070-57bde4b2d3c2?w=1200"
+      ]
+    }
+    ,marco: {
+      name:"Marco's Trattoria",
+      img:"https://randomuser.me/api/portraits/men/12.jpg",
+      bg:"https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=1600",
+      location:"Amsterdam",
+      rating:4.8,
+      years:14,
+      origin:"Napoli",
+      bio:"İtalyan ev mutfağı: taze makarna, pizzalar ve tiramisu. Malzemelerim yerel ve mevsimlik.",
+      badges:[{text:"🇮🇹 Authentic", color:"badge-gold"},{text:"🌿 Sustainable", color:"badge-green"}],
+      deliveredThisWeek:22,
+      subscribers:520
+    },
+    isabel: {
+      name:"Isabel Cocina",
+      img:"https://randomuser.me/api/portraits/women/12.jpg",
+      bg:"https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=1600",
+      location:"Utrecht",
+      rating:4.7,
+      years:10,
+      origin:"Valencia",
+      bio:"Paella, tapas ve Akdeniz lezzetleri. Deniz ürünlerinde tazelik takıntım var.",
+      badges:[{text:"🇪🇸 Authentic", color:"badge-gold"},{text:"🧂 Tapas", color:"badge-purple"}],
+      deliveredThisWeek:18,
+      subscribers:410
+    },
+    priyanka: {
+      name:"Priyanka's Curry Lab",
+      img:"https://randomuser.me/api/portraits/women/22.jpg",
+      bg:"https://images.unsplash.com/photo-1604909052743-94e3be8c46dc?w=1600",
+      location:"Rotterdam",
+      rating:4.9,
+      years:9,
+      origin:"Delhi",
+      bio:"Hint ev yemekleri: aromatik köri, naan ve tatlılar. Baharat karışımlarım ev yapımı.",
+      badges:[{text:"🇮🇳 Authentic", color:"badge-gold"},{text:"🌶️ Spicy", color:"badge-red"}],
+      deliveredThisWeek:26,
+      subscribers:600
+    },
+    kenji: {
+      name:"Kenji Home Ramen",
+      img:"https://randomuser.me/api/portraits/men/22.jpg",
+      bg:"https://images.unsplash.com/photo-1553621042-f6e147245754?w=1600",
+      location:"Den Haag",
+      rating:4.8,
+      years:11,
+      origin:"Tokyo",
+      bio:"Japon ev lezzetleri: ramen, gyoza ve donburi. Broth 12 saat kaynar :)",
+      badges:[{text:"🇯🇵 Authentic", color:"badge-gold"},{text:"🍜 Ramen", color:"badge-blue"}],
+      deliveredThisWeek:20,
+      subscribers:480
+    }
+
+};
+
+  const dishDB = {
+    soup: [ {id:'0',name:'Seçiniz...',cal:0}, {id:'s1',name:'Mercimek',cal:105,ing:'Mercimek, havuç'}, {id:'s2',name:'Ezogelin',cal:120,ing:'Bulgur, nane',alg:'Gluten'}, {id:'s3',name:'Domates',cal:85,ing:'Domates, süt',alg:'Süt'}, {id:'s4',name:'Yayla',cal:110,ing:'Yoğurt, pirinç',alg:'Süt'} ],
+    salad:[ {id:'0',name:'Seçiniz...',cal:0}, {id:'sa1',name:'Çoban',cal:90,ing:'Domates, biber'}, {id:'sa2',name:'Mevsim',cal:75,ing:'Marul, havuç'} ],
+    main: [ {id:'0',name:'Seçiniz...',cal:0}, {id:'m1',name:'İzmir Köfte',cal:320,ing:'Kıyma, patates',alg:'Gluten'}, {id:'m3',name:'Kuru Fasulye',cal:280,ing:'Fasulye, et',alg:'Süt'}, {id:'m5',name:'Hünkar Beğendi',cal:450,ing:'Patlıcan, süt',alg:'Süt'}, {id:'m6',name:'Mantı',cal:380,ing:'Hamur, kıyma',alg:'Gluten'} ],
+    side: [ {id:'0',name:'Seçiniz...',cal:0}, {id:'si1',name:'Pirinç Pilavı',cal:250,ing:'Pirinç, tereyağı',alg:'Süt'}, {id:'si2',name:'Bulgur Pilavı',cal:220,ing:'Bulgur, domates',alg:'Gluten'} ],
+    dessert:[ {id:'0',name:'Seçiniz...',cal:0}, {id:'d1',name:'Sütlaç',cal:200,ing:'Süt, pirinç',alg:'Süt'}, {id:'d2',name:'Güllaç',cal:250,ing:'Süt, ceviz',alg:'Süt, Ceviz'}, {id:'d3',name:'Baklava',cal:350,ing:'Yufka, fıstık',alg:'Gluten, Fıstık'} ],
+    drink: [ {id:'0',name:'Seçiniz...',cal:0}, {id:'dr1',name:'Ayran',cal:60,ing:'Yoğurt',alg:'Süt'}, {id:'dr2',name:'Şerbet',cal:120,ing:'Kızılcık'} ]
+  };
+
+  // Products + authenticity + diets
+  const products = [
+    {
+      id:'weekly_subscription', type:'builder', category:'weekly',
+      title:'Haftalık Abonelik Planı',
+      desc:'7 günlük menünüzü seçin. Kalori hesabı otomatik.',
+      image:'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800',
+      chef:"Ayşe'nin Mutfağı", chefId:'ayse', location:'Tüm Bölgeler',
+      price:0, minOrder:1, rating:4.8, reviews:[],
+      cuisineCountry:"TR", flag:"🇹🇷", authentic:false, diets:[]
+    },
+    {
+      id:'menu_ramadan', type:'ramadan_builder', category:'ramadan',
+      title:'Ramazan İftar Sofrası',
+      desc:'Başlangıçlar sabit, ana ve tatlı seçmeli.',
+      image:'https://images.unsplash.com/photo-1588612762283-c286e9273cba?w=800',
+      chef:"Sultan Sofrası", chefId:'sultan', location:'Üsküdar',
+      price:25, minOrder:6, rating:5.0,
+      reviews:[{user:"Fatma H.", date:"Dün", rating:5, text:"Çok bereketliydi."}],
+      cuisineCountry:"TR", flag:"🇹🇷", authentic:true, diets:["helal"]
+    },
+    {
+      id:1, type:'standard', category:'main',
+      title:'Kayseri Mantısı',
+      desc:'El açması hamur, bol kıyma.',
+      ingredients:'Un (*Gluten*), Kıyma, *Yoğurt*.',
+      image:'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=800',
+      chef:"Ayşe'nin Mutfağı", chefId:'ayse', location:'Rotterdam',
+      price:15, minOrder:4, rating:4.9,
+      badges:[{text:"🔥 Çok Satan", color:"badge-gold"}],
+      serving:"Sarımsaklı yoğurt + pul biberli tereyağı ile servis edin. Yanına turşu ve ayran önerilir.",
+      storage:"0–4°C: 2 gün. Isıtma: tavada az su ile 3–4 dk.",
+      cuisineCountry:"TR", flag:"🇹🇷", authentic:true, diets:["helal"]
+    },
+    {
+      id:2, type:'standard', category:'main',
+      title:'Zeytinyağlı Sarma',
+      desc:'İncecik sarılmış, kuş üzümlü.',
+      ingredients:'Yaprak, Pirinç, *Fıstık*.',
+      image:'https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?w=800',
+      chef:"Ayşe'nin Mutfağı", chefId:'ayse', location:'Rotterdam',
+      price:20, minOrder:1, rating:4.8,
+      badges:[{text:"🌿 Hafif", color:"badge-green"}],
+      serving:"Limon dilimi ve yanında yoğurtla servis edebilirsiniz.",
+      storage:"0–4°C: 3 gün. Soğuk servis önerilir.",
+      cuisineCountry:"TR", flag:"🇹🇷", authentic:true, diets:["helal"]
+    },
+    {
+      id:5, type:'standard', category:'main',
+      title:'Enginar Dolması',
+      desc:'Zeytinyağlı, taze enginar.',
+      ingredients:'Enginar, Pirinç, Dereotu.',
+      image:'https://images.unsplash.com/photo-1615937657715-bc7b4b7962c1?w=800',
+      chef:"Deniz'in Ege Mutfağı", chefId:'deniz', location:'Delfshaven',
+      price:8, minOrder:2, rating:4.9,
+      badges:[{text:"🌿 Vegan", color:"badge-green"}],
+      serving:"Soğuk servis önerilir. Üzerine limon ve zeytinyağı gezdirebilirsiniz.",
+      storage:"0–4°C: 3 gün.",
+      cuisineCountry:"TR", flag:"🇹🇷", authentic:true, diets:["vegan","helal"]
+    },
+    {
+      id:8, type:'standard', category:'main',
+      title:'Karadeniz Pidesi',
+      desc:'Kavurmalı, kaşarlı kapalı pide.',
+      ingredients:'Un (*Gluten*), Kavurma, Kaşar (*Süt*).',
+      image:'https://images.unsplash.com/photo-1574672280602-95cb48dad557?w=800',
+      chef:"Karadeniz Rüzgarı", chefId:'karadeniz', location:'Schiedam',
+      price:12, minOrder:2, rating:4.8,
+      serving:"Sıcak servis önerilir. Yanına ayran veya çay iyi gider.",
+      storage:"0–4°C: 1 gün. Isıtma: fırında 180°C 6–8 dk.",
+      cuisineCountry:"TR", flag:"🇹🇷", authentic:true, diets:["helal"]
+    },
+    {
+      id:11, type:'standard', category:'dessert',
+      title:'Fıstıklı Baklava',
+      desc:'Bol fıstıklı, ince hamur.',
+      ingredients:'Un (*Gluten*), *Fıstık*.',
+      image:'https://images.unsplash.com/photo-1519676867240-f03562e64548?w=800',
+      chef:"Sultan Sofrası", chefId:'sultan', location:'Üsküdar',
+      price:30, minOrder:1, rating:5.0,
+      badges:[{text:"🍯 Şerbetli", color:"badge-gold"}],
+      serving:"Yanına sade kahve veya çay önerilir.",
+      storage:"Serin/kuru yerde 3 gün.",
+      cuisineCountry:"TR", flag:"🇹🇷", authentic:true, diets:["helal"]
+    },
+    // demo italy
+    {
+      id:21, type:'standard', category:'main',
+      title:'Sicilya Usulü Pizza (Demo)',
+      desc:'İtalyan ev usulü, ince hamur.',
+      ingredients:'Un (*Gluten*), Domates, Mozzarella (*Süt*).',
+      image:'https://images.unsplash.com/photo-1548365328-9f547dbbd1d7?w=800',
+      chef:"Sultan Sofrası", chefId:'sultan', location:'Üsküdar',
+      price:18, minOrder:1, rating:4.7,
+      badges:[{text:"Authentic Recipe", color:"badge-gold"}],
+      serving:"Sıcak servis, yanında roka salatası önerilir.",
+      storage:"0–4°C: 1 gün. Isıtma: fırında 200°C 5 dk.",
+      cuisineCountry:"IT", flag:"🇮🇹", authentic:true, diets:["kosher"]
+    }
+  
+    ,
+    { id:21, type:'standard', category:'main', title:'Valencia Paella', desc:'Orijinal Valencia usulü (deniz ürünü opsiyonlu).', ingredients:'Pirinç, safran, deniz ürünü (*Kabuklu*), biber.', 
+      image:'https://images.unsplash.com/photo-1604908811849-77b0d31589e3?w=800', chef:"Maria's Paella House", chefId:'maria', location:'Amsterdam', price:22, minOrder:2, rating:4.8,
+      cuisineCountry:'ES',
+      badges:[{text:"🇪🇸 Authentic Recipe", color:"badge-gold"}],
+      serving:"Limon dilimi ve taze maydanoz ile servis. Yanına soğuk içecek önerilir.",
+      storage:"0–4°C: 1 gün. Isıtma: tavada düşük ateş 4–5 dk."
+    },
+    { id:22, type:'standard', category:'main', title:'Butter Chicken (Mild)', desc:'Kremalı, dengeli baharat (acı düşük).', ingredients:'Tavuk, domates, krema (*Süt*), baharat.', 
+      image:'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800', chef:"Arjun's Indian Kitchen", chefId:'arjun', location:'Utrecht', price:18, minOrder:2, rating:4.7,
+      cuisineCountry:'IN',
+      badges:[{text:"🇮🇳 Authentic Recipe", color:"badge-gold"},{text:"🌶️ Mild", color:"badge-red"}],
+      serving:"Basmati pilav ve naan ile servis edin. Yanına yoğurtlu raita önerilir.",
+      storage:"0–4°C: 2 gün. Isıtma: tencerede 3–4 dk."
+    },
+    { id:23, type:'standard', category:'main', title:'Tokyo Bento Box', desc:'Dengeli bento: protein + sebze + pirinç.', ingredients:'Pirinç, sebze, tavuk/balık, soya (*Gluten*).', 
+      image:'https://images.unsplash.com/photo-1553621042-f6e147245754?w=800', chef:"Yuki's Tokyo Bento", chefId:'yuki', location:'Rotterdam', price:16, minOrder:1, rating:4.9,
+      cuisineCountry:'JP',
+      badges:[{text:"🇯🇵 Authentic Recipe", color:"badge-gold"}],
+      serving:"Soğuk/sıcak tercihine göre. Soslar ayrı paketlenir.",
+      storage:"0–4°C: 1 gün."
+    },
+    { id:24, type:'standard', category:'dessert', title:'Tiramisu (Italian)', desc:'Klasik tiramisu, kahve aroması.', ingredients:'Mascarpone (*Süt*), kahve, bisküvi (*Gluten*).',
+      image:'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=800', chef:"Deniz'in Ege Mutfağı", chefId:'deniz', location:'Delfshaven', price:9, minOrder:2, rating:4.7,
+      cuisineCountry:'IT',
+      badges:[{text:"🇮🇹 Authentic", color:"badge-gold"}],
+      serving:"Soğuk servis. Üzerine kakao serpin.",
+      storage:"0–4°C: 2 gün."
+    }
+
+    ,
+    { id:21, type:'standard', category:'main', title:'Pizza Margherita', desc:'Napoli usulü ince hamur, taze mozzarella.', ingredients:'Un (*Gluten*), Domates, Mozzarella (*Süt*).',
+      image:'https://images.unsplash.com/photo-1548365328-9f547b1b9f4e?w=800', chef:"Marco's Trattoria", chefId:'marco', location:'Amsterdam', price:14, minOrder:1, rating:4.8,
+      badges:[{text:"🇮🇹 Authentic", color:"badge-gold"}],
+      serving:"Fesleğen ve zeytinyağı ile sıcak servis edin.",
+      storage:"0–4°C: 1 gün. Isıtma: fırında 200°C 4–5 dk.",
+      cuisineCountry:'it'
+    },
+    { id:22, type:'standard', category:'main', title:'Valencia Paella', desc:'Safranlı pirinç, deniz ürünleri ve sebze.', ingredients:'Pirinç, Safran, Karides, Midye (*Kabuklu*).',
+      image:'https://images.unsplash.com/photo-1604908554162-63f63683bcab?w=800', chef:"Isabel Cocina", chefId:'isabel', location:'Utrecht', price:18, minOrder:2, rating:4.7,
+      badges:[{text:"🇪🇸 Authentic", color:"badge-gold"}],
+      serving:"Limon dilimleri ve aioli ile servis edin.",
+      storage:"0–4°C: 1 gün. Isıtma: tavada 3–4 dk.",
+      cuisineCountry:'es'
+    },
+    { id:23, type:'standard', category:'main', title:'Butter Chicken', desc:'Kremalı domates soslu tavuk köri.', ingredients:'Tavuk, Domates, Krema (*Süt*), Baharat.',
+      image:'https://images.unsplash.com/photo-1604909052743-94e3be8c46dc?w=800', chef:"Priyanka's Curry Lab", chefId:'priyanka', location:'Rotterdam', price:16, minOrder:1, rating:4.9,
+      badges:[{text:"🇮🇳 Authentic", color:"badge-gold"},{text:"🌶️ Orta Acı", color:"badge-red"}],
+      serving:"Naan veya basmati pilavıyla servis edin.",
+      storage:"0–4°C: 2 gün. Isıtma: kısık ateşte 4–5 dk.",
+      cuisineCountry:'in'
+    },
+    { id:24, type:'standard', category:'main', title:'Shoyu Ramen', desc:'12 saat kaynamış broth, noodle ve yumurta.', ingredients:'Noodle (*Gluten*), Soya, Yumurta.',
+      image:'https://images.unsplash.com/photo-1553621042-f6e147245754?w=800', chef:"Kenji Home Ramen", chefId:'kenji', location:'Den Haag', price:17, minOrder:1, rating:4.8,
+      badges:[{text:"🇯🇵 Authentic", color:"badge-gold"}],
+      serving:"Broth’u ayrı, noodle’ı ayrı ısıtıp birleştirin.",
+      storage:"0–4°C: 1 gün.",
+      cuisineCountry:'jp'
+    }
+
+  ];
+
+  // Theme meta
+  let currentThemeKey = null;
+  const themeMeta = {
+    helal: { mode:'helal', title:'Helal', desc:'Helal hassasiyeti olan kullanıcılar için öne çıkan seçenekler.', chipHtml:`<i class="fa-solid fa-shield-halved"></i> Helal Tema`, chipClass:'bg-helal-light text-helal border-helal/20', hero:'https://images.unsplash.com/photo-1546549032-9571cd6b27df?w=1600' },
+    vegan: { mode:'vegan', title:'Vegan', desc:'Bitkisel menüler ve hafif seçenekler.', chipHtml:`<i class="fa-solid fa-seedling"></i> Vegan Tema`, chipClass:'bg-vegan-light text-vegan border-vegan/20', hero:'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1600' },
+    noel: { mode:'noel', title:'Noel', desc:'Özel gün / davet menüleri ve tatlılar.', chipHtml:`<i class="fa-solid fa-gift"></i> Noel Tema`, chipClass:'bg-noel-light text-noel border-noel/20', hero:'https://images.unsplash.com/photo-1547573854-74d8b42c5d71?w=1600' },
+    ramadan: { mode:'ramadan', title:'Ramazan', desc:'İftar & sahur menüleri, toplu davet paketleri.', chipHtml:`<i class="fa-solid fa-moon"></i> Ramazan Tema`, chipClass:'bg-ramadan-light text-ramadan border-ramadan/20', hero:'https://images.unsplash.com/photo-1588612762283-c286e9273cba?w=1600' }
+  };
+
+  // Taste of Home filter
+  let countryFilter = 'all';
+  function setCountryFilter(code){
+    countryFilter = code || 'all';
+    ['all','tr','it','es','in','jp'].forEach(x=>{
+      const el=document.getElementById('chip-'+x);
+      if(el) el.classList.remove('active');
+    });
+    const map={all:'chip-all',TR:'chip-tr',IT:'chip-it',ES:'chip-es',IN:'chip-in',JP:'chip-jp'};
+    const activeId=map[countryFilter] || 'chip-all';
+    const activeEl=document.getElementById(activeId);
+    if(activeEl) activeEl.classList.add('active');
+    renderProducts('all');
+  }
+
+
+  function renderTasteChips(){
+    const row = document.getElementById('taste-row');
+    const active = document.getElementById('taste-active');
+    if(!row) return;
+
+    const items = [
+      {code:'all', name:'Tümü', flag:'🌍'},
+      {code:'TR', name:'Türkiye', flag:'🇹🇷'},
+      {code:'IT', name:'İtalya', flag:'🇮🇹'},
+      {code:'ES', name:'İspanya', flag:'🇪🇸'},
+      {code:'IN', name:'Hindistan', flag:'🇮🇳'},
+      {code:'JP', name:'Japonya', flag:'🇯🇵'}
+    ];
+
+    row.innerHTML = items.map(i=>{
+      const id = `chip-${i.code}`;
+      return `
+        <button id="${id}"
+          onclick="setCountryFilter('${i.code}');"
+          class="country-chip px-4 py-2 rounded-full border text-sm font-extrabold bg-white hover:border-brand hover:text-brand transition whitespace-nowrap">
+          <span class="mr-2">${i.flag}</span>${i.name}
+        </button>
+      `;
+    }).join('');
+
+    // set active state
+    setTimeout(()=>{
+      const code = countryFilter || 'all';
+      const it = items.find(x=>x.code===code) || items[0];
+      if(active) active.innerText = it.name;
+      items.forEach(x=>{
+        const b = document.getElementById(`chip-${x.code}`);
+        if(!b) return;
+        if(x.code===code){
+          b.classList.add('bg-gray-900','text-white');
+          b.classList.remove('bg-white');
+        } else {
+          b.classList.remove('bg-gray-900','text-white');
+          b.classList.add('bg-white');
+        }
+      });
+    },0);
+  }
+
+
+  // ACTIES
+  let acties = [];
+  function isActieActive(a){
+    const now = new Date();
+    const s = a.start ? new Date(a.start+'T00:00:00') : null;
+    const e = a.end ? new Date(a.end+'T23:59:59') : null;
+    if(s && now < s) return false;
+    if(e && now > e) return false;
+    return true;
+  }
+  function getBestActieForProduct(p){
+    let best = null;
+    for(const a of acties){
+      if(!isActieActive(a)) continue;
+      if(a.chefId !== p.chefId) continue;
+      const applies = (a.scope==='all') || (a.scope==='selected' && (a.productIds||[]).includes(String(p.id)));
+      if(!applies) continue;
+      if(!best || a.percent > best.percent) best = { percent:a.percent, end:a.end || '' };
+    }
+    return best;
+  }
+  function calcDiscountedPrice(p){
+    const best = getBestActieForProduct(p);
+    if(!best) return {has:false, old:p.price, now:p.price, percent:0, savings:0, end:''};
+    const now = +(p.price * (1 - best.percent/100)).toFixed(2);
+    const savings = +(p.price - now).toFixed(2);
+    return {has:true, old:p.price, now, percent:best.percent, savings, end:best.end || ''};
+  }
+  function getActiveDeals(){
+    return products
+      .filter(p => p.type==='standard' && typeof p.price==='number' && p.price>0)
+      .map(p => ({p, disc:calcDiscountedPrice(p)}))
+      .filter(x => x.disc.has);
+  }
+
+  // Requests & offers
+  let requests = [];
+  let offers = [];
+  function saveRequests(){ syncRemoteCollection('requests', requests); }
+  function saveOffers(){ syncRemoteCollection('offers', offers); }
+  function offerCountForRequest(id){ return offers.filter(o=>o.requestId===id).length; }
+
+
+
+  // ---------------- LIVE DATABASE ----------------
+  async function syncRemoteCollection(collection, items){
+    try{
+      const res = await fetch('/api/state', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({collection, items})
+      });
+      if(!res.ok) throw new Error('HTTP '+res.status);
+    }catch(err){
+      console.error('DB sync failed:', collection, err);
+      showToast?.('Veri kaydedilemedi. Bağlantıyı kontrol edin.');
+    }
+  }
+
+  async function loadRemoteState(){
+    try{
+      const res = await fetch('/api/state', {headers:{'Accept':'application/json'}});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const data = await res.json();
+      acties = Array.isArray(data.acties) ? data.acties : [];
+      requests = Array.isArray(data.requests) ? data.requests : [];
+      offers = Array.isArray(data.offers) ? data.offers : [];
+      renderBestDeals();
+      renderProducts(currentHomeFilter || 'all');
+      if(document.getElementById('req-list')) renderRequestList();
+      if(document.getElementById('offer-list')) renderOfferList();
+      refreshOfferPickers();
+    }catch(err){
+      console.error('DB load failed:', err);
+    }
+  }
+
+  // Header theme
+  function resetHeaderTheme(){
+    const icon=document.getElementById('brand-icon');
+    const accent=document.getElementById('brand-accent');
+    icon.className="w-8 h-8 bg-brand text-white rounded flex items-center justify-center font-bold";
+    accent.className="text-brand";
+  }
+  function applyHeaderTheme(mode){
+    resetHeaderTheme();
+    const icon=document.getElementById('brand-icon');
+    const accent=document.getElementById('brand-accent');
+    if(mode==='ramadan'){ icon.className="w-8 h-8 bg-ramadan text-white rounded flex items-center justify-center font-bold"; accent.className="text-ramadan"; }
+    if(mode==='vegan'){ icon.className="w-8 h-8 bg-vegan text-white rounded flex items-center justify-center font-bold"; accent.className="text-vegan"; }
+    if(mode==='noel'){ icon.className="w-8 h-8 bg-noel text-white rounded flex items-center justify-center font-bold"; accent.className="text-noel"; }
+    if(mode==='helal'){ icon.className="w-8 h-8 bg-helal text-white rounded flex items-center justify-center font-bold"; accent.className="text-helal"; }
+  }
+
+  // Views
+  const VIEWS=['home-view','themes-view','theme-page-view','requests-view','chef-panel-view','actie-view','chef-view'];
+  function showView(id){
+    VIEWS.forEach(v=>document.getElementById(v).classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    window.scrollTo(0,0);
+  }
+  function goHome(){
+    resetHeaderTheme();
+    showView('home-view');
+    renderBestDeals();
+    renderProducts('all');
+  }
+  function openThemes(){ resetHeaderTheme(); showView('themes-view'); }
+  function openRequests(){
+    resetHeaderTheme();
+    showView('requests-view');
+    renderRequestList();
+    prefillRequestTemplate();
+    setTimeout(updateRequestThemeLinkUI,0);
+  }
+  function openChefPanel(){
+    resetHeaderTheme();
+    showView('chef-panel-view');
+    initChefPanel();
+  }
+  function openActie(){
+    resetHeaderTheme();
+    showView('actie-view');
+    initActieUI();
+  }
+
+  function openThemePage(key){
+    currentThemeKey=key;
+    const meta=themeMeta[key];
+    applyHeaderTheme(meta.mode);
+    showView('theme-page-view');
+    document.getElementById('theme-title').innerText=meta.title;
+    document.getElementById('theme-desc').innerText=meta.desc;
+    document.getElementById('theme-hero-img').src=meta.hero;
+    const chip=document.getElementById('theme-chip');
+    chip.className=`inline-flex items-center gap-2 text-xs font-bold px-3 py-1 rounded-full border ${meta.chipClass}`;
+    chip.innerHTML=meta.chipHtml;
+    renderThemeProducts('all');
+  }
+
+  function goRequestWithTheme(key){
+    openRequests();
+    setTimeout(()=>{
+      const sel=document.getElementById('req-theme');
+      if(sel){ sel.value=key || 'none'; updateRequestThemeLinkUI(); }
+    },50);
+  }
+
+  function renderThemeProducts(filter){
+    const g=document.getElementById('theme-product-grid');
+    g.innerHTML='';
+    let list=products.slice();
+
+    if(currentThemeKey==='vegan'){
+      list=list.filter(p=>(p.diets||[]).includes('vegan') || p.type==='builder');
+    }else if(currentThemeKey==='ramadan'){
+      list=list.filter(p=>p.category==='ramadan' || p.type==='ramadan_builder' || p.chefId==='sultan');
+    }else if(currentThemeKey==='noel'){
+      list=list.filter(p=>p.category==='dessert' || p.chefId==='sultan');
+    }else if(currentThemeKey==='helal'){
+      list=list.filter(p=>(p.diets||[]).includes('helal') || p.category==='ramadan');
+    }
+
+    if(filter==='deals'){
+      const dealIds=new Set(getActiveDeals().map(x=>String(x.p.id)));
+      list=list.filter(p=>dealIds.has(String(p.id)));
+    }
+
+    list=list.filter(p=>['standard','builder','ramadan_builder'].includes(p.type));
+        list = applySearchToProducts(list);
+    updateSearchHint(list.length, getThemeLabel());
+
+list.forEach(p=>g.innerHTML+=createCardHTML(p));
+  }
+
+  // Slider
+  let currentSlide=0;
+  function getSlideCount(){ const t=document.getElementById('slider-track'); return t ? t.children.length : 0; }
+  function updateSlidePosition(){ const t=document.getElementById('slider-track'); if(!t) return; t.style.transform=`translateX(-${currentSlide*100}%)`; }
+  function nextSlide(){ const n=getSlideCount(); if(n<=1) return; currentSlide=(currentSlide+1)%n; updateSlidePosition(); }
+  function prevSlide(){ const n=getSlideCount(); if(n<=1) return; currentSlide=(currentSlide-1+n)%n; updateSlidePosition(); }
+  setInterval(nextSlide,5000);
+  function scrollToGrid(){ const el=document.getElementById('product-grid'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }
+
+  // Best deals
+  function renderBestDeals(){
+    const section=document.getElementById('best-deals-section');
+    const row=document.getElementById('best-deals-row');
+    const cnt=document.getElementById('best-deals-count');
+    const deals=getActiveDeals()
+      .sort((a,b)=> (b.disc.percent-a.disc.percent) || (b.disc.savings-a.disc.savings))
+      .slice(0,8);
+
+    if(!deals.length){
+      section.classList.add('hidden');
+      row.innerHTML='';
+      cnt.innerText='0';
+      return;
+    }
+    section.classList.remove('hidden');
+    cnt.innerText=String(deals.length);
+
+    row.innerHTML=deals.map(({p,disc})=>{
+      const chef=chefDB[p.chefId];
+      const endTxt=disc.end ? new Date(disc.end+'T00:00:00').toLocaleDateString('tr-TR') : '';
+      return `
+        <div class="min-w-[280px] bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-lg transition cursor-pointer" onclick="openModal('${p.id}')">
+          <div class="relative h-36 bg-gray-100">
+            <img src="${safeImg(p.image)}" onerror="this.onerror=null;this.src=DEFAULT_IMG;" class="w-full h-full object-cover">
+            <div class="absolute top-3 left-3 chef-badge badge-gold">-%${disc.percent} Actie</div>
+            <div class="absolute top-3 right-3 bg-white/90 text-gray-800 text-xs font-bold px-2 py-1 rounded shadow">
+              Tasarruf €${disc.savings.toFixed(2)}
+            </div>
+            ${endTxt?`<div class="absolute bottom-3 left-3 bg-white/90 text-gray-800 px-2 py-1 rounded text-[10px] font-extrabold shadow border">
+              <i class="fa-solid fa-hourglass-end mr-1"></i>${endTxt}
+            </div>`:''}
+          </div>
+          <div class="p-4">
+            <div class="flex items-center gap-2 mb-2" onclick="event.stopPropagation(); openChefProfile('${p.chefId}')">
+              <img src="${safeImg(chef.img)}" onerror="this.onerror=null;this.src=DEFAULT_IMG;" class="w-6 h-6 rounded-full border">
+              <div class="text-xs font-bold text-gray-600 truncate">${chef.name}</div>
+              <i class="fa-solid fa-chevron-right text-[9px] text-gray-400 ml-auto"></i>
+            </div>
+            <div class="font-bold text-gray-800 line-clamp-1">${escapeHtml(p.title)}</div>
+            <div class="mt-2 flex items-end gap-2">
+              <span class="text-xs text-gray-400 line-through">€${disc.old.toFixed(2)}</span>
+              <span class="text-lg font-bold text-brand">€${disc.now.toFixed(2)}</span>
+            </div>
+            <div class="mt-2 text-[10px] text-gray-400 font-bold flex gap-3">
+              <span>🚚 ${chef.deliveredThisWeek ?? 0}/hafta</span>
+              <span>👥 ${(chef.subscribers ?? 0).toLocaleString()}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Diet icons
+  function dietIconsHTML(diets){
+    const d=diets||[];
+    const arr=[];
+    if(d.includes('helal')) arr.push(`<span class="diet-ico diet-helal" title="Helal"><i class="fa-solid fa-shield-halved"></i></span>`);
+    if(d.includes('vegan')) arr.push(`<span class="diet-ico diet-vegan" title="Vegan"><i class="fa-solid fa-seedling"></i></span>`);
+    if(d.includes('kosher')) arr.push(`<span class="diet-ico diet-kosher" title="Koşer"><i class="fa-solid fa-star-of-david"></i></span>`);
+    return arr.join('');
+  }
+
+  // Product cards
+  function createCardHTML(p){
+    let topBadge='';
+    if(p.category==='ramadan') topBadge='<span class="absolute top-3 left-3 bg-green-700 text-white px-2 py-1 rounded text-xs font-bold">Ramazan</span>';
+    if(p.category==='weekly') topBadge='<span class="absolute top-3 left-3 bg-brand text-white px-2 py-1 rounded text-xs font-bold">Haftalık</span>';
+
+    const chef=chefDB[p.chefId] || {};
+    const chefBadges=(chef.badges||[]).slice(0,2).map(b=>`<span class="chef-badge ${b.color}">${b.text}</span>`).join('');
+    const dishBadges=(p.badges||[]).slice(0,2).map(b=>`<span class="chef-badge ${b.color}">${b.text}</span>`).join('');
+
+    // actie bitiş etiketi    let actieEndBadge='';
+    if(p.type==='standard' && p.price){
+      const pr=calcDiscountedPrice(p);
+      if(pr.has && pr.end){
+        const endTxt=new Date(pr.end+'T00:00:00').toLocaleDateString('tr-TR');
+        actieEndBadge=`<span class="absolute bottom-3 left-3 bg-white/90 text-gray-800 px-2 py-1 rounded text-[10px] font-extrabold shadow border">
+          <i class="fa-solid fa-hourglass-end mr-1"></i>${endTxt}
+        </span>`;
+      }
+    }
+
+    // fiyat bloğu
+    let priceBlock='';
+    if(p.type!=='standard' || !p.price){
+      priceBlock='<span class="text-lg font-bold text-brand">Hesapla</span>';
+    }else{
+      const pr=calcDiscountedPrice(p);
+      if(pr.has){
+        priceBlock=`
+          <div class="flex items-end gap-2 flex-wrap">
+            <span class="text-xs text-gray-400 line-through">€${pr.old.toFixed(2)}</span>
+            <span class="text-lg font-bold text-brand">€${pr.now.toFixed(2)}</span>
+            <span class="chef-badge badge-gold">-%${pr.percent} Actie</span>
+          </div>`;
+      }else{
+        priceBlock=`<span class="text-lg font-bold text-brand">€${p.price.toFixed(2)}</span>`;
+      }
+    }
+
+    const dietsHtml=dietIconsHTML(p.diets);
+    const countryLabel=p.flag ? `${p.flag} ${p.cuisineCountry || ''}` : '';
+
+    return `
+      <div class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col h-full group cursor-pointer" onclick="openModal('${p.id}')">
+        <div class="img-container bg-gray-100 relative">
+          <img src="${safeImg(p.image)}" class="img-fit group-hover:scale-105">
+          ${topBadge}
+          ${actieEndBadge}
+          <span class="absolute top-3 right-3 bg-white px-2 py-1 rounded text-xs font-bold shadow-sm">★ ${p.rating || 0}</span>
+        </div>
+
+        <div class="p-4 flex flex-col flex-1">
+          <div class="flex items-center justify-between text-[11px] text-gray-600 mb-1">
+            <div class="flex items-center gap-1 font-bold">
+              ${countryLabel ? `<span>${countryLabel}</span>` : ''}
+              ${p.authentic ? `<span class="chef-badge badge-gold">Authentic Recipe</span>` : ''}
+            </div>
+            <div class="flex items-center gap-1">${dietsHtml}</div>
+          </div>
+
+          <div class="flex items-center gap-2 mb-2 cursor-pointer hover:bg-gray-50 rounded p-1 transition" onclick="event.stopPropagation(); openChefProfile('${p.chefId}')">
+            <img src="${chef.img || ''}" class="w-6 h-6 rounded-full border border-gray-100">
+            <span class="text-xs text-gray-500 font-bold hover:text-brand truncate">
+              ${p.chef} <i class="fa-solid fa-chevron-right text-[8px] ml-1"></i>
+            </span>
+          </div>
+
+          <h3 class="font-bold text-gray-800 text-lg mb-1 line-clamp-1">${escapeHtml(p.title)}</h3>
+          <p class="text-xs text-gray-400 mb-2 line-clamp-2">${escapeHtml(p.desc || '')}</p>
+
+          ${dishBadges ? `<div class="flex flex-wrap gap-1 mt-1">${dishBadges}</div>` : ``}
+          ${chefBadges ? `<div class="flex flex-wrap gap-1 mt-2 opacity-90">${chefBadges}</div>` : ``}
+
+          <div class="text-[10px] text-gray-400 font-bold mt-2 flex gap-2">
+            <span>🚚 ${chef.deliveredThisWeek ?? 0}/hafta</span>
+            <span>👥 ${(chef.subscribers ?? 0).toLocaleString()} abone</span>
+          </div>
+
+          <div class="mt-auto pt-3 border-t border-gray-100 flex justify-between items-end">
+            ${priceBlock}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderProducts(filter){
+    updateHomeFilterUI(filter);
+    currentHomeFilter = filter;
+
+    const g=document.getElementById('product-grid');
+    g.innerHTML='';
+    let list=[];
+    if(filter==='all') list=products;
+    else if(filter==='deals'){
+      const dealIds=new Set(getActiveDeals().map(x=>String(x.p.id)));
+      list=products.filter(p=>dealIds.has(String(p.id)));
+    }else if(filter==='weekly'){
+      list=products.filter(p=>p.category==='weekly');
+    }else{
+      list=products.filter(p=>p.category===filter);
+    }
+
+    // Taste of Home country filter
+    if(countryFilter!=='all'){
+      list=list.filter(p=>p.cuisineCountry===countryFilter);
+    }
+
+        list = applySearchToProducts(list);
+    updateSearchHint(list.length, getFilterLabel(filter));
+
+list.forEach(p=>g.innerHTML+=createCardHTML(p));
+  }
+
+  // CHEF PROFILE
+  function openChefProfile(chefKey){
+    resetHeaderTheme();
+    showView('chef-view');
+    const info=chefDB[chefKey];
+    if(!info) return;
+
+    document.getElementById('chef-profile-name').innerText=info.name;
+    document.getElementById('chef-profile-img').src=info.img;
+    document.getElementById('chef-cover-img').src=info.bg;
+    document.getElementById('chef-bio').innerText=info.aboutLong || '';
+    document.getElementById('chef-years').innerText=info.years || 0;
+    document.getElementById('chef-origin').innerText=info.origin || '';
+    document.getElementById('chef-rating-big').innerText=(info.rating||0).toFixed(1);
+    document.getElementById('chef-weekly').innerText=info.deliveredThisWeek ?? 0;
+    document.getElementById('chef-subs').innerText=(info.subscribers ?? 0).toLocaleString();
+    document.getElementById('chef-height').innerText=info.heightCm || '-';
+
+    document.getElementById('chef-profession-badge').innerText = info.profession || 'Şef';
+    document.getElementById('chef-langs-badge').innerText = 'Diller: ' + (info.languages || []).join(', ');
+    document.getElementById('chef-about-long').innerText = info.aboutLong || '';
+
+    const schUl=document.getElementById('chef-schools'); schUl.innerHTML='';
+    (info.schools||[]).forEach(s=>{ schUl.innerHTML+=`<li>• ${escapeHtml(s)}</li>`; });
+    const certUl=document.getElementById('chef-certs'); certUl.innerHTML='';
+    (info.certificates||[]).forEach(s=>{ certUl.innerHTML+=`<li>• ${escapeHtml(s)}</li>`; });
+
+    const gal=document.getElementById('chef-kitchen-gallery'); gal.innerHTML='';
+    (info.kitchenPhotos||[]).forEach(src=>{
+      gal.innerHTML+=`
+        <div class="gallery-card">
+          <img src="${src}" class="gallery-img">
+        </div>`;
+    });
+
+    document.getElementById('chef-experience').innerText = info.experienceNote || '';
+
+    const badgeContainer=document.getElementById('chef-badges');
+    badgeContainer.innerHTML='';
+    (info.badges||[]).forEach(b=>{
+      badgeContainer.innerHTML += `<span class="chef-badge ${b.color}">${b.text}</span>`;
+    });
+
+    const grid=document.getElementById('chef-grid');
+    grid.innerHTML='';
+    let list = products.filter(p=>p.chefId===chefKey);
+    list = applySearchToProducts(list);
+    updateSearchHint(list.length, 'Şef: '+info.name);
+    list.forEach(p=>grid.innerHTML+=createCardHTML(p));
+  }
+
+  // Compare
+  function openCompare(){
+    renderCompare();
+    document.getElementById('compare-overlay').classList.remove('hidden');
+    document.body.style.overflow='hidden';
+  }
+  function closeCompare(){
+    document.getElementById('compare-overlay').classList.add('hidden');
+    document.body.style.overflow='auto';
+  }
+  function renderCompare(){
+    const wrap=document.getElementById('compare-table');
+    const chefs=Object.values(chefDB).slice().sort((a,b)=>(b.rating||0)-(a.rating||0));
+    wrap.innerHTML=chefs.map(c=>{
+      const badges=(c.badges||[]).map(b=>`<span class="chef-badge ${b.color}">${b.text}</span>`).join('');
+      return `
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4">
+          <div class="flex items-center gap-3 min-w-[240px]">
+            <img src="${safeImg(c.img)}" class="w-12 h-12 rounded-full border bg-white object-cover">
+            <div>
+              <div class="font-bold text-gray-800">${c.name}</div>
+              <div class="text-xs text-gray-500">${c.location} • ${c.origin}</div>
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="flex flex-wrap gap-1">${badges}</div>
+            <div class="text-xs text-gray-500 mt-2">${escapeHtml(c.aboutLong || '')}</div>
+          </div>
+          <div class="flex gap-6 text-center">
+            <div><div class="text-lg font-bold text-yellow-500">${(c.rating||0).toFixed(1)}</div><div class="text-[10px] text-gray-500 font-bold uppercase">Puan</div></div>
+            <div><div class="text-lg font-bold text-gray-800">${c.deliveredThisWeek ?? 0}</div><div class="text-[10px] text-gray-500 font-bold uppercase">Bu hafta</div></div>
+            <div><div class="text-lg font-bold text-gray-800">${(c.subscribers ?? 0).toLocaleString()}</div><div class="text-[10px] text-gray-500 font-bold uppercase">Abone</div></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ACTIE UI
+  function initActieUI(){
+    const sel=document.getElementById('actie-chef');
+    sel.innerHTML=Object.entries(chefDB).map(([id,c])=>`<option value="${id}">${c.name}</option>`).join('');
+    renderActieProductPicker();
+    renderActieList();
+  }
+  function renderActieProductPicker(){
+    const scope=document.getElementById('actie-scope').value;
+    const box=document.getElementById('actie-product-picker');
+    const list=document.getElementById('actie-products');
+    if(scope!=='selected'){ box.classList.add('hidden'); return; }
+    box.classList.remove('hidden');
+    const chefId=document.getElementById('actie-chef').value;
+    const items=products.filter(p=>p.chefId===chefId && p.type==='standard' && p.price>0);
+    list.innerHTML=items.map(p=>`
+      <label class="flex items-center gap-2 text-sm">
+        <input type="checkbox" value="${p.id}" class="actie-prod">
+        <span class="font-bold text-gray-800">${escapeHtml(p.title)}</span>
+        <span class="ml-auto text-gray-500">€${p.price.toFixed(2)}</span>
+      </label>`).join('');
+  }
+  function saveActie(){
+    const chefId=document.getElementById('actie-chef').value;
+    const scope=document.getElementById('actie-scope').value;
+    const percent=Math.max(1,Math.min(90,parseInt(document.getElementById('actie-percent').value||'0',10)));
+    const start=document.getElementById('actie-start').value || '';
+    const end=document.getElementById('actie-end').value || '';
+    let productIds=[];
+    if(scope==='selected'){
+      productIds=Array.from(document.querySelectorAll('.actie-prod:checked')).map(x=>String(x.value));
+    }
+    const id='a_'+Math.random().toString(16).slice(2);
+    acties.unshift({id,chefId,scope,productIds,percent,start,end});
+    syncRemoteCollection('acties', acties);
+    renderActieList();
+    renderProducts('all');
+    renderBestDeals();
+  }
+  function clearActies(){
+    if(!confirm('Tüm indirimleri temizleyeyim mi?')) return;
+    acties=[];
+    syncRemoteCollection('acties', acties);
+    renderActieList();
+    renderProducts('all');
+    renderBestDeals();
+  }
+  function deleteActie(id){
+    acties=(acties||[]).filter(x=>x.id!==id);
+    syncRemoteCollection('acties', acties);
+    renderActieList();
+    renderProducts('all');
+    renderBestDeals();
+  }
+  function renderActieList(){
+    const el=document.getElementById('actie-list');
+    if(!acties.length){
+      el.innerHTML='<div class="text-gray-400 text-sm text-center py-10">Henüz indirim yok.</div>';
+      return;
+    }
+    el.innerHTML=acties.map(a=>{
+      const c=chefDB[a.chefId];
+      const active=isActieActive(a);
+      const scopeText=a.scope==='all'?'Tüm ürünler':`Seçili (${(a.productIds||[]).length})`;
+      return `
+        <div class="border border-gray-200 rounded-xl p-4 flex items-start gap-3 ${active?'bg-white':'bg-gray-50 opacity-60'}">
+          <img src="${safeImg(c.img)}" class="w-10 h-10 rounded-full border object-cover">
+          <div class="flex-1">
+            <div class="font-bold text-gray-800">${c.name}
+              <span class="ml-2 text-xs font-bold text-brand">-%${a.percent}</span>
+            </div>
+            <div class="text-xs text-gray-500">${scopeText} • ${a.start||'Bugün'} → ${a.end||'Süresiz'}</div>
+          </div>
+          <button class="text-gray-400 hover:text-red-600" onclick="deleteActie('${a.id}')">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>`;
+    }).join('');
+  }
+
+  // REQUESTS
+  function prefillRequestTemplate(){
+    const type=document.getElementById('req-type').value;
+    const title=document.getElementById('req-title');
+    const detail=document.getElementById('req-detail');
+    const people=document.getElementById('req-people');
+    const budget=document.getElementById('req-budget');
+
+    if(type==='ramadan_event'){
+      title.value="Ramazan davetim için 4 kişilik menü";
+      detail.value="İftar daveti: 4 kişi.\n- Çorba + ana + yancı + tatlı + içecek\n- Helal hassasiyeti var\n- Teslimat akşam saatlerinde\nNot: Acı az olsun.";
+      people.value=4; budget.value=0;
+    }else if(type==='athlete_week'){
+      title.value="Sporcuyum: 1 haftalık kalori hedefli menü";
+      detail.value="1 hafta için plan.\n- Günlük hedef: 2200 kcal (protein yüksek)\n- Öğle + akşam + ara öğün opsiyon\nNot: Çok yağlı olmasın.";
+      people.value=1; budget.value=0;
+    }else if(type==='birthday'){
+      title.value="Çocuğumun doğum günü: pasta + ikramlıklar";
+      detail.value="Doğum günü için:\n- 1 adet özel pasta (tema)\n- 15–20 kişilik ikramlık\nNot: Şeker dengeli olsun.";
+      people.value=15; budget.value=0;
+    }else if(type==='asian'){
+      title.value="Asya yemeği istiyorum (özel)";
+      detail.value="Asya mutfağı menüsü:\n- 2 ana yemek + 1 yan + 1 tatlı\n- Orta acı\n- Domuz eti kesinlikle olmasın.";
+      people.value=2; budget.value=0;
+    }else{
+      title.value=""; detail.value=""; people.value=1; budget.value=0;
+    }
+  }
+
+  function createRequest(){
+    const type=document.getElementById('req-type').value;
+    const title=(document.getElementById('req-title').value||'').trim();
+    const detail=(document.getElementById('req-detail').value||'').trim();
+    const people=parseInt(document.getElementById('req-people').value||'1',10);
+    const budget=parseFloat(document.getElementById('req-budget').value||'0');
+    const date=document.getElementById('req-date').value || '';
+    const theme=document.getElementById('req-theme').value || 'none';
+    if(!title || !detail){ alert("Başlık ve detay boş olamaz."); return; }
+    const id='r_'+Math.random().toString(16).slice(2);
+    requests.unshift({id,type,title,detail,people,budget,date,theme,createdAt:new Date().toISOString()});
+    saveRequests();
+    renderRequestList();
+    refreshOfferPickers();
+  }
+
+  function seedRequests(){
+    const demo=[
+      {type:'ramadan_event',title:'Ramazan davetim için 4 kişilik menü',detail:'4 kişi iftar: çorba + ana + yancı + tatlı + içecek.',people:4,budget:0,date:'',theme:'ramadan'},
+      {type:'athlete_week',title:'Sporcu menüsü: 1 haftalık (2200 kcal)',detail:'1 hafta plan: protein yüksek.',people:1,budget:0,date:'',theme:'none'},
+      {type:'birthday',title:'Doğum günü: pasta + ikramlıklar',detail:'1 pasta + 15-20 kişilik ikram.',people:15,budget:0,date:'',theme:'noel'}
+    ];
+    demo.forEach(d=>{
+      const id='r_'+Math.random().toString(16).slice(2);
+      requests.unshift({...d,id,createdAt:new Date().toISOString()});
+    });
+    saveRequests();
+    renderRequestList();
+    refreshOfferPickers();
+  }
+
+  function clearRequests(){
+    if(!confirm('Tüm talepler silinsin mi?')) return;
+    requests=[]; saveRequests();
+    offers=[]; saveOffers();
+    renderRequestList(); renderOfferList(); refreshOfferPickers();
+  }
+
+  function deleteRequest(id){
+    if(!confirm('Talep silinsin mi?')) return;
+    requests=requests.filter(r=>r.id!==id);
+    offers=offers.filter(o=>o.requestId!==id);
+    saveRequests(); saveOffers();
+    renderRequestList(); renderOfferList(); refreshOfferPickers();
+  }
+
+  function renderRequestList(){
+    const el=document.getElementById('req-list');
+    if(!requests.length){
+      el.innerHTML='<div class="text-gray-400 text-sm text-center py-10">Henüz talep yok.</div>';
+      return;
+    }
+    el.innerHTML=requests.map(r=>{
+      const count=offerCountForRequest(r.id);
+      const themeBadge=(r.theme && r.theme!=='none')
+        ? `<span class="chef-badge ${r.theme==='vegan'?'badge-green':r.theme==='noel'?'badge-red':r.theme==='helal'?'badge-blue':'badge-green'}">${r.theme}</span>`
+        : '';
+      return `
+        <div class="border border-gray-200 rounded-xl p-4 bg-white">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600">
+              <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <div class="font-bold text-gray-800">${escapeHtml(r.title)}</div>
+                ${themeBadge}
+                <span class="ml-auto text-xs font-bold ${count?'text-brand':'text-gray-400'} bg-gray-50 border border-gray-200 px-2 py-1 rounded-full">
+                  <i class="fa-solid fa-hand-holding-dollar mr-1"></i> ${count} şef teklif verdi
+                </span>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">
+                Kişi: <b>${r.people}</b> • Bütçe: <b>${r.budget?'€'+r.budget:'Belirtilmedi'}</b> • Tarih: <b>${r.date||'Belirtilmedi'}</b>
+              </div>
+              <div class="text-sm text-gray-600 mt-3 whitespace-pre-line">${escapeHtml(r.detail)}</div>
+            </div>
+            <button class="text-gray-400 hover:text-red-600" onclick="deleteRequest('${r.id}')">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function updateRequestThemeLinkUI(){
+    const themeSel=document.getElementById('req-theme');
+    const btn=document.getElementById('req-theme-link');
+    const hint=document.getElementById('req-theme-hint');
+    if(!themeSel || !btn || !hint) return;
+    const t=themeSel.value;
+    if(t && t!=='none'){ btn.classList.remove('hidden'); hint.classList.remove('hidden'); }
+    else{ btn.classList.add('hidden'); hint.classList.add('hidden'); }
+  }
+  function goThemeFromRequest(){
+    const t=document.getElementById('req-theme').value;
+    if(!t || t==='none') return;
+    if(themeMeta[t]) openThemePage(t);
+  }
+
+  // Chef panel
+  function initChefPanel(){
+    const chefSel=document.getElementById('offer-chef');
+    chefSel.innerHTML=Object.entries(chefDB).map(([id,c])=>`<option value="${id}">${c.name}</option>`).join('');
+    refreshOfferPickers();
+    renderOfferList();
+    setTimeout(()=>{ fillOfferTemplate(); autoSuggestETA(); },0);
+  }
+  function refreshOfferPickers(){
+    const reqSel=document.getElementById('offer-request');
+    if(!reqSel) return;
+    reqSel.innerHTML=requests.map(r=>`<option value="${r.id}">${escapeHtml(r.title)}</option>`).join('');
+  }
+
+  function autoSuggestETA(){
+    const reqSel=document.getElementById('offer-request');
+    const etaInput=document.getElementById('offer-eta');
+    if(!reqSel || !etaInput) return;
+    const r=requests.find(x=>x.id===reqSel.value);
+    if(!r) return;
+    if(r.type==='ramadan_event') etaInput.value="24-48 saat";
+    else if(r.type==='birthday') etaInput.value="2-3 gün";
+    else if(r.type==='athlete_week') etaInput.value="48 saat";
+    else if(r.type==='asian') etaInput.value="24 saat";
+    else etaInput.value="24-72 saat";
+  }
+
+  function fillOfferTemplate(){
+    const reqSel=document.getElementById('offer-request');
+    const note=document.getElementById('offer-note');
+    const price=document.getElementById('offer-price');
+    if(!reqSel || !note) return;
+    const r=requests.find(x=>x.id===reqSel.value);
+    if(!r){ note.value=''; return; }
+    const people=r.people||1;
+    const theme=r.theme||'none';
+    let suggestedPrice=0;
+    let template=`Talep Özeti:\n- Kişi: ${people}\n- Tema: ${theme}\n- Tarih: ${r.date || 'Belirtilmedi'}\n\n`;
+    if(r.type==='ramadan_event'){
+      suggestedPrice=Math.max(25*people,100);
+      template+=
+`Önerilen Ramazan Paket (demo):
+- Çorba + ana + yancı + tatlı + içecek
+- Sabit iftariyelik: hurma • zeytin • peynir • pide
+Not: acı düşük/orta, alerjen etiketli.\n`;
+    }else if(r.type==='athlete_week'){
+      suggestedPrice=100;
+      template+=
+`Sporcu Haftalık Plan (demo):
+- 7 gün / 2 ana öğün (+opsiyon ara öğün)
+- Protein yüksek, kızartma düşük
+Gerekli bilgi: boy/kilo/hedef, alerjen, sevmediği malzeme.\n`;
+    }else if(r.type==='birthday'){
+      suggestedPrice=120;
+      template+=
+`Doğum Günü Paketi (demo):
+- 1 özel pasta (tema/renk/yazı)
+- 15–20 kişilik ikramlık (mini börek, kurabiye vb.)
+Gerekli bilgi: tema, alerjen, teslim saati.\n`;
+    }else if(r.type==='asian'){
+      suggestedPrice=80;
+      template+=
+`Asya Menü (demo):
+- 2 ana + 1 yan + 1 tatlı
+- Acı: orta (isteğe göre)
+- Domuz eti yok.\n`;
+    }else{
+      suggestedPrice=Math.max(50,20*people);
+      template+=`Özel Talep (demo): Menü/ürün listesi netleştirilecek, teslimat ve alerjen teyit edilecek.\n`;
+    }
+    if(!note.value.trim()) note.value=template;
+    if(price && (!price.value || Number(price.value)<=0)) price.value=suggestedPrice;
+  }
+
+  function submitOffer(){
+    if(!requests.length){ alert("Önce bir talep oluşturulmalı."); return; }
+    const chefId=document.getElementById('offer-chef').value;
+    const requestId=document.getElementById('offer-request').value;
+    const price=parseFloat(document.getElementById('offer-price').value||'0');
+    const eta=document.getElementById('offer-eta').value;
+    const note=(document.getElementById('offer-note').value||'').trim();
+    if(!chefId || !requestId || !price){ alert("Şef, talep ve fiyat gerekli."); return; }
+    const id='o_'+Math.random().toString(16).slice(2);
+    offers.unshift({id,requestId,chefId,price,eta,note,createdAt:new Date().toISOString()});
+    saveOffers();
+    renderOfferList();
+    renderRequestList();
+  }
+
+  function clearOffers(){
+    if(!confirm('Tüm teklifler silinsin mi?')) return;
+    offers=[]; saveOffers();
+    renderOfferList(); renderRequestList();
+  }
+  function deleteOffer(id){
+    offers=offers.filter(o=>o.id!==id);
+    saveOffers();
+    renderOfferList(); renderRequestList();
+  }
+  function renderOfferList(){
+    const el=document.getElementById('offer-list');
+    if(!el) return;
+    if(!offers.length){
+      el.innerHTML='<div class="text-gray-400 text-sm text-center py-10">Henüz teklif yok.</div>';
+      return;
+    }
+    el.innerHTML=offers.map(o=>{
+      const chef=chefDB[o.chefId];
+      const req=requests.find(r=>r.id===o.requestId);
+      return `
+        <div class="border border-gray-200 rounded-xl p-4 bg-white">
+          <div class="flex items-start gap-3">
+            <img src="${safeImg(chef.img)}" onerror="this.onerror=null;this.src=DEFAULT_IMG;" class="w-10 h-10 rounded-full border object-cover">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <div class="font-bold text-gray-800">${chef.name}</div>
+                <span class="text-xs font-bold bg-gray-50 border border-gray-200 px-2 py-1 rounded-full">
+                  €${Number(o.price).toFixed(2)} • ${escapeHtml(o.eta)}
+                </span>
+                <span class="ml-auto text-xs font-bold text-gray-500">
+                  ${new Date(o.createdAt).toLocaleString()}
+                </span>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">
+                Talep: <b>${req ? escapeHtml(req.title) : 'Silinmiş talep'}</b>
+              </div>
+              ${o.note ? `<div class="text-sm text-gray-600 mt-3 whitespace-pre-line">${escapeHtml(o.note)}</div>` : ''}
+            </div>
+            <button class="text-gray-400 hover:text-red-600" onclick="deleteOffer('${o.id}')">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // MODAL & builders
+  let activeProduct=null, activeQty=1, builderPersonCount=1, builderSelections=[], cartTotal=0;
+  const weeklyPresets={
+    veg:{soup:'s1',salad:'sa2',main:'m5',side:'si2',dessert:'d1'},
+    protein:{soup:'s2',salad:'sa1',main:'m1',side:'si1',dessert:'d1'},
+    classic:{soup:'s4',salad:'sa1',main:'m3',side:'si1',dessert:'d1'}
+  };
+  const ramadanPresets={
+    light:{soup:'s1',main:'m5',side:'si2',dessert:'d2',drink:'dr2'},
+    feast:{soup:'s4',main:'m1',side:'si1',dessert:'d3',drink:'dr2'}
+  };
+
+  function openModal(id){
+    const p=products.find(x=>String(x.id)===String(id));
+    if(!p) return;
+    activeProduct=JSON.parse(JSON.stringify(p));
+    activeQty=p.minOrder || 1;
+    builderPersonCount=p.minOrder || 1;
+
+    builderSelections=Array(7).fill(null).map(()=>({soup:'0',salad:'0',main:'0',side:'0',dessert:'0'}));
+    if(p.type==='ramadan_builder') builderSelections=[{soup:'0',main:'0',side:'0',dessert:'0',drink:'0'}];
+
+    document.getElementById('m-title').innerText=p.title;
+    document.getElementById('m-desc').innerText=p.desc || '';
+    document.getElementById('m-img').src=p.image;
+    document.getElementById('m-chef-name').innerText=p.chef;
+    document.getElementById('m-chef-img').src=chefDB[p.chefId]?.img || '';
+    document.getElementById('m-location').innerText=p.location || '';
+
+    const discLine=document.getElementById('m-discount-line');
+    const discText=document.getElementById('m-discount-text');
+    discLine.classList.add('hidden'); discText.innerText='';
+
+    const area=document.getElementById('dynamic-content-area');
+    area.innerHTML='';
+
+    const box=document.getElementById('modal-box');
+    box.classList.remove('ramadan-mode');
+
+    const basePrice=document.getElementById('m-base-price');
+    const weeklyCal=document.getElementById('m-weekly-calories');
+    const qtyWrap=document.getElementById('qty-container');
+
+    if(p.type==='ramadan_builder'){
+      box.classList.add('ramadan-mode');
+      basePrice.className="text-xl font-bold text-green-800 bg-green-50 px-2 py-1 rounded";
+      basePrice.innerText="Ramazan";
+      qtyWrap.classList.add('hidden');
+      weeklyCal.classList.add('hidden');
+      renderRamadanBuilder(area);
+      calcRamadanTotal();
+    }else if(p.type==='builder'){
+      basePrice.className="text-xl font-bold text-brand bg-orange-50 px-2 py-1 rounded";
+      basePrice.innerText="Haftalık Abonelik";
+      qtyWrap.classList.add('hidden');
+      weeklyCal.classList.remove('hidden');
+      renderWeeklyBuilder(area);
+      calcWeeklyBuilder();
+    }else{
+      basePrice.className="text-xl font-bold text-brand bg-orange-50 px-2 py-1 rounded";
+      const d=calcDiscountedPrice(p);
+      if(d.has){
+        basePrice.innerText=`€${d.now.toFixed(2)}`;
+        discLine.classList.remove('hidden');
+        discText.innerText=`Actie: -%${d.percent} (Eski €${d.old.toFixed(2)})`;
+      }else{
+        basePrice.innerText=`€${Number(p.price).toFixed(2)}`;
+      }
+      qtyWrap.classList.remove('hidden');
+      weeklyCal.classList.add('hidden');
+      renderStandard(area);
+      calcStandard();
+    }
+
+    const rc=(activeProduct.reviews||[]).length;
+    document.getElementById('m-review-count').innerText=rc;
+    renderReviews();
+    switchTab('details');
+
+    document.getElementById('modal-overlay').classList.remove('hidden');
+    document.body.style.overflow='hidden';
+    document.getElementById('m-qty').innerText=activeQty;
+  }
+
+  function closeModal(){
+    document.getElementById('modal-overlay').classList.add('hidden');
+    document.body.style.overflow='auto';
+  }
+
+  function switchTab(t){
+    const d=document.getElementById('content-details');
+    const r=document.getElementById('content-reviews');
+    const f=document.getElementById('modal-footer');
+    if(t==='details'){
+      d.classList.remove('hidden'); r.classList.add('hidden'); f.classList.remove('hidden');
+      document.getElementById('btn-tab-details').classList.add('active');
+      document.getElementById('btn-tab-reviews').classList.remove('active');
+    }else{
+      d.classList.add('hidden'); r.classList.remove('hidden'); f.classList.add('hidden');
+      document.getElementById('btn-tab-details').classList.remove('active');
+      document.getElementById('btn-tab-reviews').classList.add('active');
+    }
+  }
+
+  function renderStandard(container){
+    const chef=chefDB[activeProduct.chefId] || {};
+    const dishBadges=(activeProduct.badges||[]).map(b=>`<span class="chef-badge ${b.color}">${b.text}</span>`).join('');
+    const chefBadges=(chef.badges||[]).map(b=>`<span class="chef-badge ${b.color}">${b.text}</span>`).join('');
+
+    container.innerHTML=`
+      <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div class="font-bold text-sm text-gray-800">İçerik & Alerjenler</div>
+          <div class="flex flex-wrap gap-1">${dishBadges}</div>
+        </div>
+        <div class="mt-2 text-xs text-gray-600 leading-relaxed">
+          ${parseAllergens(activeProduct.ingredients || '') || '<span class="text-gray-400">Belirtilmedi</span>'}
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border border-gray-200">
+        <div class="flex items-center gap-2 mb-2">
+          <i class="fa-solid fa-plate-wheat text-gray-400"></i>
+          <div class="font-bold text-sm text-gray-800">Servis önerisi</div>
+        </div>
+        <p class="text-sm text-gray-600 leading-relaxed">${escapeHtml(activeProduct.serving || '—')}</p>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border border-gray-200">
+        <div class="flex items-center gap-2 mb-2">
+          <i class="fa-solid fa-box-archive text-gray-400"></i>
+          <div class="font-bold text-sm text-gray-800">Saklama & Isıtma</div>
+        </div>
+        <p class="text-sm text-gray-600 leading-relaxed">${escapeHtml(activeProduct.storage || '—')}</p>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border border-gray-200">
+        <div class="flex items-center gap-2 mb-2">
+          <i class="fa-solid fa-user-check text-gray-400"></i>
+          <div class="font-bold text-sm text-gray-800">Şef Özeti</div>
+        </div>
+        <div class="flex flex-wrap gap-1 mb-2">${chefBadges}</div>
+        <div class="text-sm text-gray-600 leading-relaxed">${escapeHtml(chef.aboutLong || '')}</div>
+        <div class="mt-3 text-xs text-gray-500 font-bold flex gap-4 flex-wrap">
+          <span>★ ${(chef.rating||0).toFixed(1)}</span>
+          <span>🚚 ${chef.deliveredThisWeek ?? 0}/hafta</span>
+          <span>👥 ${(chef.subscribers ?? 0).toLocaleString()} abone</span>
+        </div>
+      </div>`;
+  }
+
+  function calcStandard(){
+    const p=activeProduct;
+    const disc=calcDiscountedPrice(p);
+    const unit=disc.has ? disc.now : p.price;
+    document.getElementById('m-total-price').innerText=`€${(unit*activeQty).toFixed(2)}`;
+  }
+  function updateQty(delta){
+    const next=activeQty+delta;
+    if(next<(activeProduct.minOrder||1)) return;
+    activeQty=next;
+    document.getElementById('m-qty').innerText=activeQty;
+    calcStandard();
+  }
+
+  // Weekly builder
+  function renderWeeklyBuilder(container){
+    const days=["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"];
+    const courses=[
+      {k:'soup',l:'Çorba',db:dishDB.soup},
+      {k:'salad',l:'Salata',db:dishDB.salad},
+      {k:'main',l:'Ana',db:dishDB.main},
+      {k:'side',l:'Yancı',db:dishDB.side},
+      {k:'dessert',l:'Tatlı',db:dishDB.dessert}
+    ];
+    let html=`
+      <div class="mb-4 flex flex-col gap-4">
+        <div class="border-b border-gray-100 pb-3">
+          <h4 class="font-bold text-sm text-gray-800 mb-2">1) Kişi sayısı</h4>
+          <div class="flex gap-2 overflow-x-auto pb-1">
+            ${[1,2,3,4,5,6].map(n=>`
+              <button onclick="setBuilderP(${n})" class="p-btn border rounded px-3 py-1 text-sm ${n===builderPersonCount?'bg-brand text-white':'bg-white'}" data-v="${n}">${n}</button>
+            `).join('')}
+          </div>
+        </div>
+        <div>
+          <h4 class="font-bold text-sm text-gray-800 mb-2">2) Hızlı seçim</h4>
+          <div class="flex gap-2 overflow-x-auto pb-1">
+            <button onclick="applyWeeklyPreset('demo')" class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded text-xs font-bold hover:bg-indigo-200">🎲 Demo</button>
+            <button onclick="applyWeeklyPreset('veg')" class="bg-green-100 text-green-700 px-3 py-1 rounded text-xs font-bold hover:bg-green-200">🥗 Vejetaryen</button>
+            <button onclick="applyWeeklyPreset('protein')" class="bg-red-100 text-red-700 px-3 py-1 rounded text-xs font-bold hover:bg-red-200">🥩 Protein</button>
+            <button onclick="applyWeeklyPreset('classic')" class="bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-bold hover:bg-gray-200">🍲 Klasik</button>
+            <button onclick="applyWeeklyPreset('clear')" class="bg-gray-100 text-gray-600 px-3 py-1 rounded text-xs font-bold hover:bg-gray-200">🗑️ Temizle</button>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-4">`;
+    days.forEach((day,dIdx)=>{
+      html+=`
+        <div class="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+          <div class="bg-gray-100 px-3 py-1 font-bold text-xs text-brand border-b border-gray-200">${day}</div>
+          <div class="p-2 grid grid-cols-1 md:grid-cols-5 gap-2">`;
+      courses.forEach(c=>{
+        const opts=c.db.map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+        html+=`
+          <div>
+            <label class="text-[9px] font-bold text-gray-400 block uppercase">${c.l}</label>
+            <select onchange="updateWeeklyDish(${dIdx},'${c.k}',this.value)" data-d="${dIdx}" data-k="${c.k}" class="w-full border rounded text-xs p-1">
+              ${opts}
+            </select>
+            <div id="info-${dIdx}-${c.k}" class="dish-info-box"></div>
+          </div>`;
+      });
+      html+='</div></div>';
+    });
+    html+='</div>';
+    container.innerHTML=html;
+  }
+
+  function applyWeeklyPreset(type){
+    const days=7;
+    if(type==='clear'){
+      for(let i=0;i<days;i++){
+        ['soup','salad','main','side','dessert'].forEach(k=>{
+          const sel=document.querySelector(`select[data-d="${i}"][data-k="${k}"]`);
+          if(sel){ sel.value='0'; updateWeeklyDish(i,k,'0'); }
+        });
+      }
+      return;
+    }
+    if(type==='demo'){
+      for(let i=0;i<days;i++){
+        ['soup','salad','main','side','dessert'].forEach(k=>{
+          const db=dishDB[k];
+          const rand=db[Math.floor(Math.random()*(db.length-1))+1].id;
+          const sel=document.querySelector(`select[data-d="${i}"][data-k="${k}"]`);
+          if(sel){ sel.value=rand; updateWeeklyDish(i,k,rand); }
+        });
+      }
+      return;
+    }
+    const pre=weeklyPresets[type] || weeklyPresets.classic;
+    for(let i=0;i<days;i++){
+      for(const [k,v] of Object.entries(pre)){
+        const sel=document.querySelector(`select[data-d="${i}"][data-k="${k}"]`);
+        if(sel){ sel.value=v; updateWeeklyDish(i,k,v); }
+      }
+    }
+  }
+
+  function updateWeeklyDish(dIdx,type,id){
+    builderSelections[dIdx][type]=id;
+    const dish=dishDB[type].find(d=>d.id===id);
+    const box=document.getElementById(`info-${dIdx}-${type}`);
+    if(dish && dish.id!=='0'){
+      const alg=dish.alg ? parseAllergens('*'+dish.alg+'*') : '';
+      box.innerHTML=`<div class="flex justify-between font-bold"><span>${dish.cal} kcal</span></div><p class="text-gray-500 leading-tight">${dish.ing}</p>${alg}`;
+      box.classList.add('active');
+    }else{
+      box.classList.remove('active');
+    }
+    calcWeeklyBuilder();
+  }
+
+  function calcWeeklyBuilder(){
+    let cal=0;
+    builderSelections.forEach(d=>{
+      ['soup','salad','main','side','dessert'].forEach(k=>{
+        const x=dishDB[k].find(z=>z.id===d[k]);
+        if(x) cal+=x.cal;
+      });
+    });
+    document.getElementById('m-total-price').innerText=`€${(100*builderPersonCount).toFixed(2)}`;
+    document.getElementById('m-cal-val').innerText=(cal*builderPersonCount).toLocaleString();
+  }
+
+  // Ramadan builder
+  function renderRamadanBuilder(container){
+    const courses=[
+      {k:'soup',l:'Çorba',db:dishDB.soup},
+      {k:'main',l:'Ana',db:dishDB.main},
+      {k:'side',l:'Yancı',db:dishDB.side},
+      {k:'dessert',l:'Tatlı',db:dishDB.dessert},
+      {k:'drink',l:'İçecek',db:dishDB.drink}
+    ];
+    let html=`
+      <div class="mb-4 border-b border-gray-100 pb-4">
+        <h4 class="font-bold text-sm text-gray-800 mb-2">1) Kişi (Min 6)</h4>
+        <div class="flex gap-2 overflow-x-auto pb-1">
+          ${[6,7,8,10,12].map(n=>`
+            <button onclick="setBuilderP(${n})" class="p-btn border rounded px-3 py-1 text-sm ${n===builderPersonCount?'bg-green-700 text-white':'bg-white'}" data-v="${n}">${n}</button>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h4 class="font-bold text-sm text-gray-800 mb-2">2) Hazır menüler</h4>
+        <div class="flex gap-2 flex-wrap">
+          <button onclick="applyRamadanPreset('light')" class="bg-teal-100 text-teal-800 px-3 py-1 rounded text-xs font-bold hover:bg-teal-200">🌿 Hafif</button>
+          <button onclick="applyRamadanPreset('feast')" class="bg-orange-100 text-orange-800 px-3 py-1 rounded text-xs font-bold hover:bg-orange-200">🍗 Ziyafet</button>
+          <button onclick="applyRamadanPreset('clear')" class="bg-gray-100 text-gray-600 px-3 py-1 rounded text-xs font-bold hover:bg-gray-200">🗑️ Temizle</button>
+        </div>
+      </div>
+
+      <div class="bg-green-50 border border-green-200 rounded p-3 mb-4">
+        <h4 class="font-bold text-xs text-green-800 uppercase">Sabit İftariyelik (Dahil)</h4>
+        <p class="text-xs text-green-700">Hurma • Zeytin • Pastırma • Peynir • Pide</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">`;
+    courses.forEach(c=>{
+      const opts=c.db.map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+      html+=`
+        <div>
+          <label class="text-[9px] font-bold text-gray-400 block uppercase">${c.l}</label>
+          <select onchange="updateRamadanDish('${c.k}',this.value)" data-k="${c.k}" class="w-full border rounded text-xs p-2">
+            ${opts}
+          </select>
+          <div id="info-ram-${c.k}" class="dish-info-box"></div>
+        </div>`;
+    });
+    html+='</div>';
+    container.innerHTML=html;
+  }
+
+  function applyRamadanPreset(type){
+    if(type==='clear'){
+      ['soup','main','side','dessert','drink'].forEach(k=>{
+        const sel=document.querySelector(`select[data-k="${k}"]`);
+        if(sel){ sel.value='0'; updateRamadanDish(k,'0'); }
+      });
+      return;
+    }
+    const pre=ramadanPresets[type] || ramadanPresets.light;
+    for(const [k,v] of Object.entries(pre)){
+      const sel=document.querySelector(`select[data-k="${k}"]`);
+      if(sel){ sel.value=v; updateRamadanDish(k,v); }
+    }
+  }
+
+  function updateRamadanDish(type,id){
+    builderSelections[0][type]=id;
+    const dish=dishDB[type].find(d=>d.id===id);
+    const box=document.getElementById(`info-ram-${type}`);
+    if(dish && dish.id!=='0'){
+      const alg=dish.alg ? parseAllergens('*'+dish.alg+'*') : '';
+      box.innerHTML=`<div class="flex justify-between font-bold text-green-800"><span>${dish.cal} kcal</span></div><p class="text-gray-600 leading-tight">${dish.ing}</p>${alg}`;
+      box.style.borderLeftColor="#047857";
+      box.classList.add('active');
+    }else{
+      box.classList.remove('active');
+    }
+    calcRamadanTotal();
+  }
+
+  function calcRamadanTotal(){
+    document.getElementById('m-total-price').innerText=`€${(25*builderPersonCount).toFixed(2)}`;
+  }
+
+  function setBuilderP(n){
+    builderPersonCount=n;
+    document.querySelectorAll('.p-btn').forEach(b=>{
+      const isActive=parseInt(b.dataset.v,10)===n;
+      if(activeProduct?.type==='ramadan_builder'){
+        b.className=`p-btn border rounded px-3 py-1 text-sm ${isActive?'bg-green-700 text-white':'bg-white'}`;
+      }else{
+        b.className=`p-btn border rounded px-3 py-1 text-sm ${isActive?'bg-brand text-white':'bg-white'}`;
+      }
+    });
+    if(activeProduct?.type==='ramadan_builder') calcRamadanTotal();
+    else calcWeeklyBuilder();
+  }
+
+  // Reviews
+  function renderReviews(){
+    const list = document.getElementById('reviews-list');
+    list.innerHTML = '';
+    if(!activeProduct?.reviews || activeProduct.reviews.length===0){
+      list.innerHTML = `<div class="text-center py-8 text-gray-400"><p class="text-sm">Henüz yorum yok.</p></div>`;
+      return;
+    }
+
+    activeProduct.reviews.forEach(r=>{
+      let stars='';
+      for(let i=0;i<5;i++){
+        stars += (i<r.rating)
+          ? '<i class="fa-solid fa-star text-yellow-400 text-xs"></i>'
+          : '<i class="fa-regular fa-star text-gray-300 text-xs"></i>';
+      }
+
+      const photos = Array.isArray(r.photos) ? r.photos.filter(Boolean) : [];
+      const photosHtml = photos.length ? `
+        <div class="mt-3 grid grid-cols-3 sm:grid-cols-4 gap-2">
+          ${photos.slice(0,8).map((src,idx)=>`
+            <button class="group relative overflow-hidden rounded-lg border border-gray-200 bg-gray-50" onclick="openPhoto('${src}')">
+              <img src="${src}" class="w-full h-20 object-cover group-hover:scale-[1.03] transition"/>
+              <span class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition"></span>
+            </button>
+          `).join('')}
+        </div>
+        <div class="mt-2 text-[11px] text-gray-400 font-medium">Fotoğrafa tıklayınca yeni sekmede açılır.</div>
+      ` : '';
+
+      list.innerHTML += `
+        <div class="bg-white border border-gray-100 p-4 rounded-xl shadow-sm">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <span class="font-bold text-sm text-gray-800 block">${escapeHtml(r.user)}</span>
+              <span class="text-[10px] text-gray-400">${escapeHtml(r.date)}</span>
+            </div>
+            <div class="flex gap-0.5">${stars}</div>
+          </div>
+          <p class="text-xs text-gray-600 leading-relaxed">${escapeHtml(r.text)}</p>
+          ${photosHtml}
+        </div>
+      `;
+    });
+  }
+
+  function openPhoto(src){
+    if(!src) return;
+    window.open(src, '_blank', 'noopener');
+  }
+
+  // Cart
+
+  
+  
+  // cart (Sepete Ekle -> mini checkout)
+  let pendingCartBase = 0;
+  let pendingCartTitle = '';
+  function openCheckout(basePrice){
+    pendingCartBase = Number(basePrice || 0);
+    pendingCartTitle = activeProduct?.title || 'Sipariş';
+    document.getElementById('co-title').innerText = pendingCartTitle;
+    document.getElementById('co-note').value = '';
+    document.querySelectorAll('.co-addon').forEach(x=>{ x.checked=false; });
+    updateCheckoutTotal();
+    document.getElementById('checkout-mini').classList.remove('hidden');
+  }
+  function closeCheckout(){
+    document.getElementById('checkout-mini').classList.add('hidden');
+  }
+  function updateCheckoutTotal(){
+    let extra = 0;
+    document.querySelectorAll('.co-addon:checked').forEach(x=>{
+      extra += Number(x.dataset.price || 0);
+    });
+    const total = pendingCartBase + extra;
+    document.getElementById('co-total').innerText = '€' + total.toFixed(2);
+  }
+  function showToast(msg){
+    const t = document.getElementById('gp-toast');
+    const tx = document.getElementById('gp-toast-text');
+    tx.innerText = msg;
+    t.classList.remove('hidden');
+    clearTimeout(window.__gp_toast_timer);
+    window.__gp_toast_timer = setTimeout(()=> t.classList.add('hidden'), 3200);
+  }
+  function confirmCheckout(){
+    const finalText = document.getElementById('co-total').innerText.replace('€','');
+    const finalPrice = parseFloat(finalText) || 0;
+    cartTotal += finalPrice;
+    document.getElementById('header-cart-total').innerText = '€' + cartTotal.toFixed(2);
+
+    const badge = document.getElementById('cart-badge');
+    badge.classList.remove('hidden');
+    badge.innerText = String((parseInt(badge.innerText || '0',10) || 0) + 1);
+
+    const when = document.getElementById('co-time').value;
+    // (Demo) sipariş detaylarını saklamak istersen burada localStorage'a yazabiliriz.
+    closeCheckout();
+    closeModal();
+    showToast(`Hazırlanmaya başlıyor 😄 (Zaman: ${when}) — başlayınca ve hazır olunca haber verilecek!`);
+  }
+
+  function addToCart(){
+    const priceText = document.getElementById('m-total-price').innerText.replace('€','');
+    const base = parseFloat(priceText) || 0;
+    openCheckout(base);
+  }
+
+
+  
+
+function setDelivery(m){
+    const bp=document.getElementById('btn-pickup');
+    const bd=document.getElementById('btn-delivery');
+    if(m==='pickup'){
+      bp.className="flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded bg-gray-100 text-gray-800 shadow-sm transition";
+      bd.className="flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded text-gray-400 hover:text-gray-800 transition";
+    }else{
+      bd.className="flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded bg-gray-100 text-gray-800 shadow-sm transition";
+      bp.className="flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded text-gray-400 hover:text-gray-800 transition";
+    }
+  }
+
+  // Helpers
+  
+  // ---------------------------
+  // SEARCH (Global)
+  // ---------------------------
+  let searchQuery = '';
+  let currentHomeFilter = 'all';
+
+  function getFilterLabel(filter){
+    if(filter==='all') return 'Tümü';
+    if(filter==='deals') return 'İndirimler';
+    if(filter==='weekly') return 'Haftalık Abonelik';
+    if(filter==='ramadan') return 'Ramazan';
+    if(filter==='main') return 'Ana Yemek';
+    if(filter==='dessert') return 'Tatlı';
+    return String(filter || 'Tümü');
+  }
+
+  function getThemeLabel(){
+    if(!currentThemeKey) return 'Tema';
+    const meta = themeMeta[currentThemeKey];
+    return meta ? ('Tema: '+meta.title) : 'Tema';
+  }
+
+  function onSearchInput(val){
+    searchQuery = String(val || '').trim().toLowerCase();
+    const clearBtn = document.getElementById('search-clear');
+    if(clearBtn){
+      if(searchQuery) clearBtn.classList.remove('hidden');
+      else clearBtn.classList.add('hidden');
+    }
+    rerenderForSearch();
+  }
+
+  function clearSearch(){
+    const inp = document.getElementById('search-input');
+    if(inp) inp.value = '';
+    onSearchInput('');
+  }
+
+  function applySearchToProducts(list){
+    if(!searchQuery) return list;
+
+    return (list || []).filter(p=>{
+      const chef = chefDB[p.chefId] || {};
+      const hay = [
+        p.title, p.desc, p.category, p.type,
+        p.ingredients, p.serving, p.storage,
+        p.chef, chef.name, chef.location, chef.origin,
+        (chef.languages||[]).join(' '),
+        (chef.badges||[]).map(b=>b.text).join(' '),
+        (p.badges||[]).map(b=>b.text).join(' ')
+      ].join(' ').toLowerCase();
+
+      return hay.includes(searchQuery);
+    });
+  }
+
+  function updateSearchHint(count, contextLabel){
+    const hint = document.getElementById('search-hint');
+    const ctx = document.getElementById('search-context');
+    const cnt = document.getElementById('search-count');
+    if(!hint || !ctx || !cnt) return;
+
+    if(!searchQuery){
+      hint.classList.add('hidden');
+      return;
+    }
+    hint.classList.remove('hidden');
+    ctx.innerText = contextLabel || 'Tümü';
+    cnt.innerText = String(count ?? 0);
+  }
+
+  function rerenderForSearch(){
+    const active = VIEWS.find(v => !document.getElementById(v).classList.contains('hidden'));
+    if(active === 'home-view'){
+      renderProducts(currentHomeFilter || 'all');
+      renderBestDeals();
+    } else if(active === 'theme-page-view'){
+      renderThemeProducts('all');
+    } else if(active === 'chef-view'){
+      // re-open current chef profile view render (simple refresh)
+      const name = document.getElementById('chef-profile-name')?.innerText || '';
+      // find by name
+      const key = Object.keys(chefDB).find(k => chefDB[k].name === name);
+      if(key) openChefProfile(key);
+    } else {
+      // pages without product lists
+      updateSearchHint(0, 'Bu sayfada arama');
+    }
+  }
+
+  // ---------------------------
+  // WELCOME POPUP
+  // ---------------------------
+  
+  
+  // ---------------------------
+  // WELCOME POPUP (günde 1 kez)
+  // ---------------------------
+  let welcomeProductId = null;
+
+  function pickWelcomeProduct(){
+    const deals = getActiveDeals().sort((a,b)=> (b.disc.percent - a.disc.percent));
+    if(deals.length) return String(deals[0].p.id);
+    const std = products.filter(p=>p.type==='standard');
+    if(!std.length) return null;
+    return String(std[Math.floor(Math.random()*std.length)].id);
+  }
+
+  function maybeShowWelcome(){
+    const overlay = document.getElementById('welcome-overlay');
+    if(!overlay) return;
+
+    const todayKey = 'gp_welcome_' + new Date().toISOString().slice(0,10);
+    if(localStorage.getItem(todayKey)==='1') return;
+
+    welcomeProductId = pickWelcomeProduct();
+    if(!welcomeProductId) return;
+
+    const p = products.find(x=>String(x.id)===String(welcomeProductId));
+    if(!p) return;
+
+    const chef = chefDB[p.chefId];
+    const disc = (p.type==='standard') ? calcDiscountedPrice(p) : null;
+
+    document.getElementById('welcome-img').src = p.image;
+    document.getElementById('welcome-title').innerText = p.title;
+    document.getElementById('welcome-chef').innerText = chef?.name || p.chef || '—';
+    document.getElementById('welcome-price').innerText = (disc && disc.has) ? `€${disc.now.toFixed(2)}` : (p.price ? `€${Number(p.price).toFixed(2)}` : 'Hesapla');
+
+    overlay.classList.remove('hidden');
+    document.body.style.overflow='hidden';
+  }
+
+  function closeWelcome(){
+    const overlay = document.getElementById('welcome-overlay');
+    if(!overlay) return;
+    overlay.classList.add('hidden');
+    document.body.style.overflow='auto';
+  }
+
+  function skipWelcomeToday(){
+    const todayKey = 'gp_welcome_' + new Date().toISOString().slice(0,10);
+    localStorage.setItem(todayKey,'1');
+    closeWelcome();
+  }
+
+  function openWelcomeProduct(){
+    const todayKey = 'gp_welcome_' + new Date().toISOString().slice(0,10);
+    localStorage.setItem(todayKey,'1');
+    closeWelcome();
+    if(welcomeProductId) openModal(welcomeProductId);
+  }
+
+
+  function openWelcome(){
+    // pick best deal if any, otherwise weekly subscription, otherwise first product
+    const deals = getActiveDeals().sort((a,b)=> (b.disc.percent - a.disc.percent));
+    const pick = deals[0]?.p || products.find(p=>p.id==='weekly_subscription') || products[0];
+    if(!pick) return;
+
+    welcomeProductId = pick.id;
+
+    const wrap = document.getElementById('welcome-card');
+    if(wrap){
+      const chef = chefDB[pick.chefId] || {};
+      const disc = (pick.type==='standard') ? calcDiscountedPrice(pick) : {has:false};
+      wrap.innerHTML = `
+        <div class="border border-gray-200 rounded-2xl overflow-hidden hover:shadow-lg transition">
+          <div class="relative h-44 bg-gray-100">
+            <img src="${pick.image}" class="w-full h-full object-cover">
+            ${disc.has ? `<div class="absolute top-3 left-3 chef-badge badge-gold">-%${disc.percent} Actie</div>` : ``}
+            <div class="absolute bottom-3 left-3 bg-white/90 text-gray-900 px-3 py-2 rounded-xl shadow border border-white/40">
+              <div class="text-xs font-extrabold uppercase text-gray-500">Öneri</div>
+              <div class="font-bold">${escapeHtml(pick.title)}</div>
+            </div>
+          </div>
+          <div class="p-4">
+            <div class="flex items-center gap-2">
+              <img src="${chef.img||''}" class="w-8 h-8 rounded-full border object-cover">
+              <div class="text-sm font-bold text-gray-800">${escapeHtml(chef.name || pick.chef || '')}</div>
+              <div class="ml-auto text-sm font-extrabold text-brand">
+                ${pick.type==='standard' ? (disc.has ? `€${disc.now.toFixed(2)}` : `€${Number(pick.price||0).toFixed(2)}`) : 'Hesapla'}
+              </div>
+            </div>
+            <div class="text-xs text-gray-500 mt-2 line-clamp-2">${escapeHtml(pick.desc || '')}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById('welcome-overlay').classList.remove('hidden');
+    document.body.style.overflow='hidden';
+  }
+
+  function closeWelcome(){
+    document.getElementById('welcome-overlay').classList.add('hidden');
+    document.body.style.overflow='auto';
+  }
+
+  function tryWelcome(){
+    closeWelcome();
+    if(welcomeProductId) openModal(String(welcomeProductId));
+  }
+
+
+  // Image fallback (no broken images)
+  const GP_PLACEHOLDER_IMG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'><rect width='100%25' height='100%25' fill='%23f1f5f9'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='Arial' font-size='24'>Görsel hazırlanıyor</text></svg>";
+  function safeImg(url){ return (url && String(url).trim()) ? url : GP_PLACEHOLDER_IMG; }
+
+function parseAllergens(txt){
+    if(!txt) return "";
+    return String(txt).replace(/\*(.*?)\*/g,'<span class="allergen-tag"><i class="fa-solid fa-triangle-exclamation"></i> $1</span>');
+  }
+  function escapeHtml(str){
+    return String(str||'')
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#039;');
+  }
+
+  // INIT
+  window.onload=async ()=>{
+    renderProducts('all');
+    renderBestDeals();
+    renderTasteChips();
+    await loadRemoteState();
+    setTimeout(maybeShowWelcome, 600);
+  };
+</script>
+
+</body>
+</html>
